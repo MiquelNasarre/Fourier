@@ -6,34 +6,43 @@
 #define InitialWinPos   Vector2i(86,25)
 #define ScreenWidth     1180
 #define ScreenHeight    640
-#define Scale 100
 #define Ex -7
 #define Ey 30
 #define DistanceGrid 0.5f
 #define GridColor Color(170,170,170,255)
+#define MaxScale 1000
+#define MinScale 10
 
 class Renderer
 {
 private:
-    RenderTarget& m_target;
+    RenderTarget&           m_target;
+    std::vector<Texture>    Textures;
+    std::vector<Sprite>     Sprites;
+    float Scale = 200;
 
 public:
     explicit
         Renderer(RenderTarget& target) : m_target{ target } {
     }
 
+    void InitializeTextures();
     void render(Vector2i Pos, Objects Obj) const;
-    static Vector2f R2Pos(Vector2f Pos, Vector2i ScreenPos);
-    static Vector2f R2Pos(Vector2f Pos, float Radius);
-    static Vector2f ScPos(Vector2f Pos, float Radius);
-    static Vector2f ScPos(Vector2f Pos, Vector2f Dimensions);
+    void ModifyScale(float increment);
+    float getScale();
+    static Vector2f R2Pos(Vector2f Pos, Vector2i ScreenPos, float scale);
+    static Vector2f R2Pos(Vector2f Pos, float Radius, float scale);
+    static Vector2f ScPos(Vector2f Pos, float Radius, float scale);
+    static Vector2f ScPos(Vector2f Pos, Vector2f Dimensions, float scale);
     static Color ColorConvert(RGBA Col);
+    static void TransparentGreenScreen(Image* image);
 
     void RenderMousePosition(Vector2i Pos) const;
     void RenderGrid() const;
     void RenderAxis() const;
-    void RenderCircles(Objects Obj) const;
-    void RenderRectangles(Objects Obj) const;
+    void RenderCircles(Objects Obj, Vector2i Pos) const;
+    void RenderButtons(Objects Obj) const;
     void RenderFunctions(Objects Obj) const;
-
+    void RenderCircleDescription(Objects Obj, int n, Vector2i Pos) const;
+    void RenderSettings(Vector2f Pos, bool State, int depth);
 };

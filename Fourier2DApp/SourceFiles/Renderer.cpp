@@ -1,5 +1,22 @@
 #include "Renderer.h"
 
+void Renderer::InitializeTextures()
+{
+    Image   image;
+    Texture ButtonTex;
+    Sprite  Button;
+
+    image.loadFromFile("Resources/Textures/CustomButtons.png");
+    TransparentGreenScreen(&image);
+    ButtonTex.loadFromImage(image, IntRect(0, 104, 157, 352));
+    Textures.push_back(ButtonTex);
+    ButtonTex.loadFromImage(image, IntRect(157, 104, 157, 352));
+    Textures.push_back(ButtonTex);
+    Button.setTexture(Textures[0]);
+    Button.setScale(1.f, 1.f);
+    Sprites.push_back(Button);
+}
+
 void Renderer::render(Vector2i Pos, Objects Obj) const
 {
     m_target.clear(Color::White);
@@ -7,50 +24,77 @@ void Renderer::render(Vector2i Pos, Objects Obj) const
     RenderAxis();
     RenderGrid();
     RenderFunctions(Obj);
-    RenderCircles(Obj);
-    RenderRectangles(Obj);
+    RenderCircles(Obj,Pos);
+    RenderButtons(Obj);
     RenderMousePosition(Pos);
 }
 
-Vector2f Renderer::R2Pos(Vector2f Pos, Vector2i ScreenPos)
+void Renderer::ModifyScale(float increment)
+{
+    Scale = Scale * (float)pow(1.05, increment);
+    if (Scale < MinScale) {
+        Scale = MinScale;
+    }
+    if (Scale > MaxScale) {
+        Scale = MaxScale;
+    }
+}
+
+float Renderer::getScale()
+{
+    return Scale;
+}
+
+Vector2f Renderer::R2Pos(Vector2f Pos, Vector2i ScreenPos, float scale)
 {
     Vector2f Vec;
     Vec.x = (float)Pos.x - (float)ScreenPos.x - (float)ScreenWidth / 2 + Ex;
     Vec.y = (float)ScreenHeight / 2 - (float)Pos.y + (float)ScreenPos.y + Ey;
-    Vec.x = Vec.x / Scale;
-    Vec.y = Vec.y / Scale;
+    Vec.x = Vec.x / scale;
+    Vec.y = Vec.y / scale;
     return Vec;
 }
 
-Vector2f Renderer::R2Pos(Vector2f Pos, float Radius)
+Vector2f Renderer::R2Pos(Vector2f Pos, float Radius, float scale)
 {
     Vector2f Vec;
     Vec.x = (float)Pos.x - (float)ScreenWidth / 2 + Radius;
     Vec.y = (float)ScreenHeight / 2 - (float)Pos.y - Radius;
-    Vec.x = Vec.x / Scale;
-    Vec.y = Vec.y / Scale;
+    Vec.x = Vec.x / scale;
+    Vec.y = Vec.y / scale;
     return Vec;
 }
 
-Vector2f Renderer::ScPos(Vector2f Pos, float Radius)
+Vector2f Renderer::ScPos(Vector2f Pos, float Radius, float scale)
 {
     Vector2f Vec;
-    Vec.x = Pos.x * Scale - Radius + ScreenWidth / 2;
-    Vec.y = - Pos.y * Scale - Radius + ScreenHeight / 2;
+    Vec.x = Pos.x * scale - Radius + ScreenWidth / 2;
+    Vec.y = - Pos.y * scale - Radius + ScreenHeight / 2;
     return Vec;
 }
 
-Vector2f Renderer::ScPos(Vector2f Pos, Vector2f Dimensions)
+Vector2f Renderer::ScPos(Vector2f Pos, Vector2f Dimensions, float scale)
 {
     Vector2f Vec;
-    Vec.x = Pos.x * Scale - Dimensions.x / 2 + ScreenWidth / 2;
-    Vec.y = -Pos.y * Scale - Dimensions.y / 2 + ScreenHeight / 2;
+    Vec.x = Pos.x * scale - Dimensions.x / 2 + ScreenWidth / 2;
+    Vec.y = -Pos.y * scale - Dimensions.y / 2 + ScreenHeight / 2;
     return Vec;
 }
 
 Color Renderer::ColorConvert(RGBA Col)
 {
     return Color(Col.R, Col.G, Col.B, Col.A);
+}
+
+void Renderer::TransparentGreenScreen(Image* image)
+{
+    for (unsigned int i = 0; i < image->getSize().x; i++) {
+        for (unsigned int j = 0; j < image->getSize().y; j++) {
+            if (image->getPixel(i, j) == Color(0, 255, 0, 255)) {
+                image->setPixel(i, j, Color::Transparent);
+            }
+        }
+    }
 }
 
 void Renderer::RenderMousePosition(Vector2i Pos) const
@@ -60,7 +104,7 @@ void Renderer::RenderMousePosition(Vector2i Pos) const
     Back.setFillColor(Color(210, 210, 210, 255));
     m_target.draw(Back);
 
-    Vector2f mpR2 = R2Pos((Vector2f)Mouse::getPosition(), Pos);
+    Vector2f mpR2 = R2Pos((Vector2f)Mouse::getPosition(), Pos, Scale);
     int Eraserx = 4, Erasery = 4;
     if (mpR2.x < 0)Eraserx++;
     if (mpR2.y < 0)Erasery++;
@@ -79,34 +123,34 @@ void Renderer::RenderMousePosition(Vector2i Pos) const
 
 void Renderer::RenderGrid() const
 {
-    Vector2f Origin = R2Pos(Vector2f(0.f, 0.f), 0.f);
+    Vector2f Origin = R2Pos(Vector2f(0.f, 0.f), 0.f, Scale);
     for (int i = 1; i < -Origin.x / DistanceGrid; i++) {
-        Vertex t0(ScPos(Vector2f(DistanceGrid * i, Origin.y), 0.f));
-        Vertex t1(ScPos(Vector2f(DistanceGrid * i, -Origin.y), 0.f));
+        Vertex t0(ScPos(Vector2f(DistanceGrid * i, Origin.y), 0.f, Scale));
+        Vertex t1(ScPos(Vector2f(DistanceGrid * i, -Origin.y), 0.f, Scale));
         t0.color = GridColor;
         t1.color = GridColor;
         Vertex Yaxis[] = { t0,t1 };
         m_target.draw(Yaxis, 2, Lines);
     }
     for (int i = 1; i < -Origin.x / DistanceGrid; i++) {
-        Vertex t0(ScPos(Vector2f(-DistanceGrid * i, Origin.y), 0.f));
-        Vertex t1(ScPos(Vector2f(-DistanceGrid * i, -Origin.y), 0.f));
+        Vertex t0(ScPos(Vector2f(-DistanceGrid * i, Origin.y), 0.f, Scale));
+        Vertex t1(ScPos(Vector2f(-DistanceGrid * i, -Origin.y), 0.f, Scale));
         t0.color = GridColor;
         t1.color = GridColor;
         Vertex Yaxis[] = { t0,t1 };
         m_target.draw(Yaxis, 2, Lines);
     }
     for (int i = 1; i < Origin.y / DistanceGrid; i++) {
-        Vertex t0(ScPos(Vector2f(Origin.x, DistanceGrid * i), 0.f));
-        Vertex t1(ScPos(Vector2f(-Origin.x, DistanceGrid * i), 0.f));
+        Vertex t0(ScPos(Vector2f(Origin.x, DistanceGrid * i), 0.f, Scale));
+        Vertex t1(ScPos(Vector2f(-Origin.x, DistanceGrid * i), 0.f, Scale));
         t0.color = GridColor;
         t1.color = GridColor;
         Vertex Yaxis[] = { t0,t1 };
         m_target.draw(Yaxis, 2, Lines);
     }
     for (int i = 1; i < Origin.y / DistanceGrid; i++) {
-        Vertex t0(ScPos(Vector2f(Origin.x, -DistanceGrid * i), 0.f));
-        Vertex t1(ScPos(Vector2f(-Origin.x, -DistanceGrid * i), 0.f));
+        Vertex t0(ScPos(Vector2f(Origin.x, -DistanceGrid * i), 0.f, Scale));
+        Vertex t1(ScPos(Vector2f(-Origin.x, -DistanceGrid * i), 0.f, Scale));
         t0.color = GridColor;
         t1.color = GridColor;
         Vertex Yaxis[] = { t0,t1 };
@@ -129,38 +173,40 @@ void Renderer::RenderAxis() const
     m_target.draw(Xaxis, 2, Lines);
 }
 
-void Renderer::RenderCircles(Objects Obj) const
+void Renderer::RenderCircles(Objects Obj, Vector2i ScreenPos) const
 {
     CircleShape     Circle;
     Vector2f        Pos;
     float           Rad;
     RGBA            Col;
-
+    
     for (int i = 0; i < Obj.NumOfCircles; i++) {
+        if (Obj.GetCircleDescription(i))
+            RenderCircleDescription(Obj, i, ScreenPos);
         Pos = Obj.GetCirclePos(i);
         Rad = Obj.GetCircleRadius(i);
         Col = Obj.GetCircleColor(i);
 
         Circle.setRadius(Rad);
-        Circle.setPosition(ScPos(Pos, Rad));
+        Circle.setPosition(ScPos(Pos, Rad, Scale));
         Circle.setFillColor(ColorConvert(Col));
         m_target.draw(Circle);
     }
 }
 
-void Renderer::RenderRectangles(Objects Obj) const
+void Renderer::RenderButtons(Objects Obj) const
 {
     RectangleShape  Rectangle;
     Vector2f        Pos, Dim;
     RGBA            Col;
 
-    for (int i = 0; i < Obj.NumOfRectangles; i++) {
-        Pos = Obj.GetRectanglePos(i);
-        Dim = Obj.GetRectangleDimensions(i);
-        Col = Obj.GetRectangleColor(i);
+    for (int i = 0; i < Obj.NumOfButtons; i++) {
+        Pos = Obj.GetButtonPos(i);
+        Dim = Obj.GetButtonDimensions(i);
+        Col = Obj.GetButtonColor(i);
 
         Rectangle.setSize(Dim);
-        Rectangle.setPosition(ScPos(Pos, Dim));
+        Rectangle.setPosition(ScPos(Pos, Dim, Scale));
         Rectangle.setFillColor(ColorConvert(Col));
         m_target.draw(Rectangle);
     }
@@ -171,13 +217,62 @@ void Renderer::RenderFunctions(Objects Obj) const
     for (int n = 0; n < Obj.NumOfFunctions; n++) {
         PixelFunction* Function = Obj.GetFunction(n);
         for (int i = 0; i < Function->N - 1; i++) {
-            Vertex t0 = ScPos(Vector2f(Function->x[i], Function->y[i]), 0);
-            Vertex t1 = ScPos(Vector2f(Function->x[i + 1], Function->y[i + 1]), 0);
+            Vertex t0 = ScPos(Vector2f(Function->x[i], Function->y[i]), 0, Scale);
+            Vertex t1 = ScPos(Vector2f(Function->x[i + 1], Function->y[i + 1]), 0, Scale);
             t0.color = ColorConvert(Function->Color[i]);
             t1.color = ColorConvert(Function->Color[i+1]);
             Vertex line[] = { t0,t1 };
             m_target.draw(line, 2, Lines);
         }
+    }
+}
+
+void Renderer::RenderCircleDescription(Objects Obj, int n, Vector2i ScreenPos) const
+{
+    CircleShape     Circle;
+    Vector2f        Pos = Obj.GetCirclePos(n);
+    float           Rad = Obj.GetCircleRadius(n);
+
+    Circle.setRadius(Rad + 3);
+    Circle.setPosition(ScPos(Pos, Rad + 3, Scale));
+    Circle.setFillColor(Color(180,180,180,255));
+    m_target.draw(Circle);
+
+    std::string String = 'P' + std::to_string(n + 1) + '(' + 
+            std::to_string(Obj.GetCirclePos(n).x).erase(std::to_string(Obj.GetCirclePos(n).x).length() - 4) + ',' +
+            std::to_string(Obj.GetCirclePos(n).y).erase(std::to_string(Obj.GetCirclePos(n).y).length() - 4) + ')';
+    Text text;
+    Font font;
+    font.loadFromFile("Resources/Fonts/arial.ttf");
+    text.setString(String);
+    text.setCharacterSize(12);
+    text.setFont(font);
+    text.setFillColor(Color::Black);
+    text.setPosition((float)Mouse::getPosition().x - (float)ScreenPos.x, (float)Mouse::getPosition().y - (float)ScreenPos.y - 40.f);
+    m_target.draw(text);
+
+}
+
+void Renderer::RenderSettings(Vector2f Pos, bool State, int depth)
+{
+    Sprites[0].setPosition(Pos);
+    if (!State) {
+        Sprites[0].setTexture(Textures[1]);
+        m_target.draw(Sprites[0]);
+    }
+    else {
+        Sprites[0].setTexture(Textures[0]);
+        std::string String = "Fourier Depth:  " + std::to_string(depth);
+        Text text;
+        Font font;
+        font.loadFromFile("Resources/Fonts/arial.ttf");
+        text.setString(String);
+        text.setCharacterSize(12);
+        text.setFont(font);
+        text.setFillColor(Color::Black);
+        text.setPosition(Pos.x + 10.f, Pos.y + 35.f);
+        m_target.draw(Sprites[0]);
+        m_target.draw(text);
     }
 }
 

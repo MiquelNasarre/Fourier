@@ -32,6 +32,19 @@ void Objects::SetCircleColor(int n, RGBA c)
 	return;
 }
 
+void Objects::SetCircleDescription(int n, bool d)
+{
+	Circles[n].Description = d;
+	return;
+}
+
+void Objects::SetDescriptionsFalse()
+{
+	for (int i = 0; i < NumOfCircles; i++)
+		Circles[i].Description = false;
+	return;
+}
+
 Vector2f Objects::GetCirclePos(int n)
 {
 	return Circles[n].Position;
@@ -47,10 +60,15 @@ RGBA Objects::GetCircleColor(int n)
 	return Circles[n].Color;
 }
 
-void Objects::InitializeRectangles(int N, float* Width, float* Height, float* Xs, float* Ys, RGBA* Col)
+bool Objects::GetCircleDescription(int n)
 {
-	NumOfRectangles = N;
-	Rectangles = (RectangleStr*)calloc(sizeof(RectangleStr), N);
+	return Circles[n].Description;
+}
+
+void Objects::InitializeButtons(int N, float* Width, float* Height, float* Xs, float* Ys, RGBA* Col)
+{
+	NumOfButtons = N;
+	Rectangles = (ButtonStr*)calloc(sizeof(ButtonStr), N);
 	for (int i = 0; i < N; i++) {
 		Rectangles[i].Position.x = Xs[i];
 		Rectangles[i].Position.y = Ys[i];
@@ -60,36 +78,36 @@ void Objects::InitializeRectangles(int N, float* Width, float* Height, float* Xs
 	}
 }
 
-void Objects::SetRectanglePos(int n, float x, float y)
+void Objects::SetButtonPos(int n, float x, float y)
 {
 	Rectangles[n].Position.x = x;
 	Rectangles[n].Position.y = y;
 	return;
 }
 
-void Objects::SetRectangleDimensions(int n, Vector2f Dim)
+void Objects::SetButtonDimensions(int n, Vector2f Dim)
 {
 	Rectangles[n].Dimensions = Dim;
 	return;
 }
 
-void Objects::SetRectangleColor(int n, RGBA c)
+void Objects::SetButtonColor(int n, RGBA c)
 {
 	Rectangles[n].Color = c;
 	return;
 }
 
-Vector2f Objects::GetRectanglePos(int n)
+Vector2f Objects::GetButtonPos(int n)
 {
 	return Rectangles[n].Position;
 }
 
-Vector2f Objects::GetRectangleDimensions(int n)
+Vector2f Objects::GetButtonDimensions(int n)
 {
 	return Rectangles[n].Dimensions;
 }
 
-RGBA Objects::GetRectangleColor(int n)
+RGBA Objects::GetButtonColor(int n)
 {
 	return Rectangles[n].Color;
 }
