@@ -11,7 +11,7 @@ found to represent this type of fourier series so far.
 - [Visual Studio](https://visualstudio.com) (Is mandatory for the program to be able to unite all the diffent C++ files)
 - [SFML 2.6.0](https://www.sfml-dev.org/download.php) (The files needed are already included in the repository)
 ## How to use it
-First we clone the repository into our computer and we open de solution file with Visual Studio, then we compile the only
+First we clone the repository into our computer and we open the solution file with Visual Studio, then we compile the only
 project inside and the App should be up and running, you should compile it in 32bit (x86).
 Note: if you don't operate in Windows you might have some compatibility problems with the SFML renderer.
 ## Math involved
