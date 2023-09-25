@@ -2,7 +2,7 @@
 In this repository I'll be adding all the tools that I'm gonna be using for my TFG, currently it consists in a simple application
 that using the tools provided by SFML is able to plot a 2D Fourier Series computed by a discrete number of points in $\mathbb{R}^2$.
 
-![GUI example](https://github.com/MiquelNasarre/Fourier/assets/124403865/8bd5df6e-91ea-4503-bab5-b1c16fbef0cb)
+![GUI example](https://github.com/MiquelNasarre/Fourier/assets/124403865/b76e4b34-5871-4097-8caf-3f8767895c66)
 
 Here you can see an example of how the interface is looking right now, it only has a couple of options but it's the best tool I've
 found to represent this type of fourier series so far.
