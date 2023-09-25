@@ -159,6 +159,18 @@ void Fourier::CreateDataSet(Objects Obj)
 	}
 }
 
+void Fourier::AddPointstoDataSet(int Points)
+{
+	D->N = Points;
+	D->X = (double*)calloc(sizeof(double), D->N);
+	D->Y = (double*)calloc(sizeof(double), D->N);
+
+	for (int i = 0; i < D->N; i++) {
+		D->X[i] = EvalX(2 * i * Pi / D->N);
+		D->Y[i] = EvalY(2 * i * Pi / D->N);
+	}
+}
+
 dataset Fourier::FourierS0DataSet(int N)
 {
 	dataset Graph;

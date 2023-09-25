@@ -7,7 +7,7 @@ void Renderer::InitializeTextures()
     Sprite  Button;
 
     image.loadFromFile("Resources/Textures/CustomButtons.png");
-    TransparentGreenScreen(&image);
+    Objects::TransparentGreenScreen(&image);
     ButtonTex.loadFromImage(image, IntRect(0, 104, 157, 352));
     Textures.push_back(ButtonTex);
     ButtonTex.loadFromImage(image, IntRect(157, 104, 157, 352));
@@ -25,7 +25,6 @@ void Renderer::render(Vector2i Pos, Objects Obj) const
     RenderGrid();
     RenderFunctions(Obj);
     RenderCircles(Obj,Pos);
-    RenderButtons(Obj);
     RenderMousePosition(Pos);
 }
 
@@ -84,17 +83,6 @@ Vector2f Renderer::ScPos(Vector2f Pos, Vector2f Dimensions, float scale)
 Color Renderer::ColorConvert(RGBA Col)
 {
     return Color(Col.R, Col.G, Col.B, Col.A);
-}
-
-void Renderer::TransparentGreenScreen(Image* image)
-{
-    for (unsigned int i = 0; i < image->getSize().x; i++) {
-        for (unsigned int j = 0; j < image->getSize().y; j++) {
-            if (image->getPixel(i, j) == Color(0, 255, 0, 255)) {
-                image->setPixel(i, j, Color::Transparent);
-            }
-        }
-    }
 }
 
 void Renderer::RenderMousePosition(Vector2i Pos) const
@@ -196,20 +184,8 @@ void Renderer::RenderCircles(Objects Obj, Vector2i ScreenPos) const
 
 void Renderer::RenderButtons(Objects Obj) const
 {
-    RectangleShape  Rectangle;
-    Vector2f        Pos, Dim;
-    RGBA            Col;
-
-    for (int i = 0; i < Obj.NumOfButtons; i++) {
-        Pos = Obj.GetButtonPos(i);
-        Dim = Obj.GetButtonDimensions(i);
-        Col = Obj.GetButtonColor(i);
-
-        Rectangle.setSize(Dim);
-        Rectangle.setPosition(ScPos(Pos, Dim, Scale));
-        Rectangle.setFillColor(ColorConvert(Col));
-        m_target.draw(Rectangle);
-    }
+    for (int i = 0; i < Obj.NumOfButtons; i++)
+        RenderButton(Obj.getButton(i));
 }
 
 void Renderer::RenderFunctions(Objects Obj) const
@@ -253,16 +229,25 @@ void Renderer::RenderCircleDescription(Objects Obj, int n, Vector2i ScreenPos) c
 
 }
 
-void Renderer::RenderSettings(Vector2f Pos, bool State, int depth)
+void Renderer::RenderSettings(Vector2f Pos, bool State, int depth, int smoothness, int points, Objects Obj)
 {
     Sprites[0].setPosition(Pos);
     if (!State) {
-        Sprites[0].setTexture(Textures[1]);
+        if (OpenSettingsTexture) {
+            Sprites[0].setTexture(Textures[1]);
+            OpenSettingsTexture = false;
+        }
         m_target.draw(Sprites[0]);
     }
     else {
-        Sprites[0].setTexture(Textures[0]);
-        std::string String = "Fourier Depth:  " + std::to_string(depth);
+        if (!OpenSettingsTexture) {
+            Sprites[0].setTexture(Textures[0]);
+            OpenSettingsTexture = true;
+        }
+        
+        std::string String = "Fourier Depth:  " + std::to_string(depth) + 
+            "\n\nSmoothness:  " + std::to_string(smoothness) + "\n\nPoints:\t\t       " + 
+            std::to_string(points) + "\n\n     Reset\t\t\t   Draw";
         Text text;
         Font font;
         font.loadFromFile("Resources/Fonts/arial.ttf");
@@ -272,7 +257,16 @@ void Renderer::RenderSettings(Vector2f Pos, bool State, int depth)
         text.setFillColor(Color::Black);
         text.setPosition(Pos.x + 10.f, Pos.y + 35.f);
         m_target.draw(Sprites[0]);
+        RenderButtons(Obj);
         m_target.draw(text);
+    }
+}
+
+void Renderer::RenderButton(Button* button) const
+{   
+    if (button->ToBe) {
+        button->sprite.setTexture(button->Textures[button->State]);
+        m_target.draw(button->sprite);
     }
 }
 

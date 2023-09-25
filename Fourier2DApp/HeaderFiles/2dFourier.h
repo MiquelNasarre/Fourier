@@ -49,6 +49,7 @@ class Fourier {
 
 	//SFML
 	void CreateDataSet(Objects Obj);
+	void AddPointstoDataSet(int Points);
 	dataset FourierS0DataSet(int N);
 
 

@@ -11,4 +11,6 @@
 #include "SFML/Network.hpp"
 #include "SFML/Audio.hpp"
 
+#define NumOfTexturesButtons 3
+
 using namespace sf;

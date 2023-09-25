@@ -20,6 +20,7 @@ private:
     std::vector<Texture>    Textures;
     std::vector<Sprite>     Sprites;
     float Scale = 200;
+    bool OpenSettingsTexture = true;
 
 public:
     explicit
@@ -35,7 +36,6 @@ public:
     static Vector2f ScPos(Vector2f Pos, float Radius, float scale);
     static Vector2f ScPos(Vector2f Pos, Vector2f Dimensions, float scale);
     static Color ColorConvert(RGBA Col);
-    static void TransparentGreenScreen(Image* image);
 
     void RenderMousePosition(Vector2i Pos) const;
     void RenderGrid() const;
@@ -44,5 +44,6 @@ public:
     void RenderButtons(Objects Obj) const;
     void RenderFunctions(Objects Obj) const;
     void RenderCircleDescription(Objects Obj, int n, Vector2i Pos) const;
-    void RenderSettings(Vector2f Pos, bool State, int depth);
+    void RenderSettings(Vector2f Pos, bool State, int depth, int smoothness, int points, Objects Obj);
+    void RenderButton(Button* button) const;
 };
