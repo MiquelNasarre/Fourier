@@ -2,14 +2,8 @@
 
 #include "Header.h"
 
-#define IncreaseDepthButton			0
-#define DecreaseDepthButton			1
-#define IncreaseSmoothnessButton	2
-#define DecreaseSmoothnessButton	3
-#define IncreasePointsButton		4
-#define DecreasePointsButton		5
-#define ResetButton					6
-#define DrawButton					7
+#define PointsRadius 4.f
+#define PointsColor RGBA('g')
 
 struct RGBA {
 	unsigned char R = 0;
@@ -91,20 +85,19 @@ struct RGBA {
 	}
 };
 
-struct CircleStr {
+struct Point {
 	Vector2f Position;
 	float Radius;
 	RGBA Color;
-	bool Description = false;
-};
+	bool Description;
 
-struct ButtonStr {
-	Vector2f Position;
-	Vector2f Dimensions;
-	RGBA Color;
-	unsigned char Texture;
-	float Scale;
-	
+	Point(){}
+	Point(Vector2f position, float radius = PointsRadius, RGBA color = PointsColor, bool description = false) {
+		Position = position;
+		Radius = radius;
+		Color = color;
+		Description = description;
+	}
 };
 
 struct PixelFunction {
@@ -125,7 +118,7 @@ public:
 	bool ToBe;
 
 	Button(std::string TextureFile, std::vector<Vector2i> PosInFile, Vector2i SizeInFile, Vector2f scale, Vector2f position = Vector2f(0.f, 0.f), bool Draw = true);
-	Button(){}
+	Button();
 
 	void setPosition(Vector2f Pos);
 	void setPosition(float x, float y);
@@ -133,38 +126,7 @@ public:
 	void IncreasePosition(float dx, float dy);
 	void setScale(Vector2f Pos);
 	void setScale(float x, float y);
+	bool IsinPos(Vector2i MouseScPos);
 };
 
-class Objects {
-private:
-	CircleStr*		Circles;
-	ButtonStr*	Rectangles;
-	PixelFunction*	Functions;
-	std::vector<Button> Buttons;
-	
-public:
-	int NumOfCircles;
-	int NumOfButtons;
-	int NumOfFunctions = 0;
-
-	void InitializeCircles(int N, float* Radius, float* Xs, float* Ys, RGBA* Col);
-	void SetCirclePos(int n, float x, float y);
-	void SetCircleRadius(int n, float r);
-	void SetCircleColor(int n, RGBA c);
-	void SetCircleDescription(int n, bool d);
-	void SetDescriptionsFalse();
-
-	Vector2f GetCirclePos(int n);
-	float GetCircleRadius(int n);
-	RGBA GetCircleColor(int n);
-	bool GetCircleDescription(int n);
-
-	void InitializeButtons();
-	Button* getButton(int i);
-
-	void AddFunction(int n, float* x, float* y, RGBA* Col);
-	void ModifyFunction(int N, int n, float* x, float* y, RGBA* Col);
-	PixelFunction* GetFunction(int n);
-	static void TransparentGreenScreen(Image* image);
-
-};
+void TransparentGreenScreen(Image* image);

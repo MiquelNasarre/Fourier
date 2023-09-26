@@ -1,30 +1,16 @@
 #include "Renderer.h"
 
-void Renderer::InitializeTextures()
+void Renderer::SetWindowPos(Vector2i WinPos)
 {
-    Image   image;
-    Texture ButtonTex;
-    Sprite  Button;
-
-    image.loadFromFile("Resources/Textures/CustomButtons.png");
-    Objects::TransparentGreenScreen(&image);
-    ButtonTex.loadFromImage(image, IntRect(0, 104, 157, 352));
-    Textures.push_back(ButtonTex);
-    ButtonTex.loadFromImage(image, IntRect(157, 104, 157, 352));
-    Textures.push_back(ButtonTex);
-    Button.setTexture(Textures[0]);
-    Button.setScale(1.f, 1.f);
-    Sprites.push_back(Button);
+    WindowPos = WinPos;
 }
 
-void Renderer::render(Vector2i Pos, Objects Obj) const
+void Renderer::renderPlain(Vector2i Pos) const
 {
     m_target.clear(Color::White);
 
     RenderAxis();
     RenderGrid();
-    RenderFunctions(Obj);
-    RenderCircles(Obj,Pos);
     RenderMousePosition(Pos);
 }
 
@@ -161,53 +147,41 @@ void Renderer::RenderAxis() const
     m_target.draw(Xaxis, 2, Lines);
 }
 
-void Renderer::RenderCircles(Objects Obj, Vector2i ScreenPos) const
+void Renderer::RenderPoint(Point P, int i) const
 {
-    CircleShape     Circle;
-    Vector2f        Pos;
-    float           Rad;
-    RGBA            Col;
-    
-    for (int i = 0; i < Obj.NumOfCircles; i++) {
-        if (Obj.GetCircleDescription(i))
-            RenderCircleDescription(Obj, i, ScreenPos);
-        Pos = Obj.GetCirclePos(i);
-        Rad = Obj.GetCircleRadius(i);
-        Col = Obj.GetCircleColor(i);
+    if (P.Description)
+        RenderCircleDescription(P, i);
+    CircleShape Circle;
+    Circle.setPosition(ScPos(P.Position, P.Radius, Scale));
+    Circle.setRadius(P.Radius);
+    Circle.setFillColor(ColorConvert(P.Color));
+    m_target.draw(Circle);
+}
 
-        Circle.setRadius(Rad);
-        Circle.setPosition(ScPos(Pos, Rad, Scale));
-        Circle.setFillColor(ColorConvert(Col));
-        m_target.draw(Circle);
+void Renderer::RenderButtons(std::vector<Button> Buttons)
+{
+    int N = Buttons.size();
+    for (int i = 0; i < N; i++)
+        RenderButton(Buttons[i]);
+}
+
+void Renderer::RenderFunction(PixelFunction& Function) const
+{
+    for (int i = 0; i < Function.N - 1; i++) {
+        Vertex t0 = ScPos(Vector2f(Function.x[i], Function.y[i]), 0, Scale);
+        Vertex t1 = ScPos(Vector2f(Function.x[i + 1], Function.y[i + 1]), 0, Scale);
+        t0.color = ColorConvert(Function.Color[i]);
+        t1.color = ColorConvert(Function.Color[i + 1]);
+        Vertex line[] = { t0,t1 };
+        m_target.draw(line, 2, Lines);
     }
 }
 
-void Renderer::RenderButtons(Objects Obj) const
-{
-    for (int i = 0; i < Obj.NumOfButtons; i++)
-        RenderButton(Obj.getButton(i));
-}
-
-void Renderer::RenderFunctions(Objects Obj) const
-{
-    for (int n = 0; n < Obj.NumOfFunctions; n++) {
-        PixelFunction* Function = Obj.GetFunction(n);
-        for (int i = 0; i < Function->N - 1; i++) {
-            Vertex t0 = ScPos(Vector2f(Function->x[i], Function->y[i]), 0, Scale);
-            Vertex t1 = ScPos(Vector2f(Function->x[i + 1], Function->y[i + 1]), 0, Scale);
-            t0.color = ColorConvert(Function->Color[i]);
-            t1.color = ColorConvert(Function->Color[i+1]);
-            Vertex line[] = { t0,t1 };
-            m_target.draw(line, 2, Lines);
-        }
-    }
-}
-
-void Renderer::RenderCircleDescription(Objects Obj, int n, Vector2i ScreenPos) const
+void Renderer::RenderCircleDescription(Point P, int n) const
 {
     CircleShape     Circle;
-    Vector2f        Pos = Obj.GetCirclePos(n);
-    float           Rad = Obj.GetCircleRadius(n);
+    Vector2f        Pos = P.Position;
+    float           Rad = P.Radius;
 
     Circle.setRadius(Rad + 3);
     Circle.setPosition(ScPos(Pos, Rad + 3, Scale));
@@ -215,8 +189,8 @@ void Renderer::RenderCircleDescription(Objects Obj, int n, Vector2i ScreenPos) c
     m_target.draw(Circle);
 
     std::string String = 'P' + std::to_string(n + 1) + '(' + 
-            std::to_string(Obj.GetCirclePos(n).x).erase(std::to_string(Obj.GetCirclePos(n).x).length() - 4) + ',' +
-            std::to_string(Obj.GetCirclePos(n).y).erase(std::to_string(Obj.GetCirclePos(n).y).length() - 4) + ')';
+            std::to_string(Pos.x).erase(std::to_string(Pos.x).length() - 4) + ',' +
+            std::to_string(Pos.y).erase(std::to_string(Pos.y).length() - 4) + ')';
     Text text;
     Font font;
     font.loadFromFile("Resources/Fonts/arial.ttf");
@@ -224,49 +198,29 @@ void Renderer::RenderCircleDescription(Objects Obj, int n, Vector2i ScreenPos) c
     text.setCharacterSize(12);
     text.setFont(font);
     text.setFillColor(Color::Black);
-    text.setPosition((float)Mouse::getPosition().x - (float)ScreenPos.x, (float)Mouse::getPosition().y - (float)ScreenPos.y - 40.f);
+    text.setPosition((float)Mouse::getPosition().x - (float)WindowPos.x, (float)Mouse::getPosition().y - (float)WindowPos.y - 40.f);
     m_target.draw(text);
 
 }
 
-void Renderer::RenderSettings(Vector2f Pos, bool State, int depth, int smoothness, int points, Objects Obj)
-{
-    Sprites[0].setPosition(Pos);
-    if (!State) {
-        if (OpenSettingsTexture) {
-            Sprites[0].setTexture(Textures[1]);
-            OpenSettingsTexture = false;
-        }
-        m_target.draw(Sprites[0]);
-    }
-    else {
-        if (!OpenSettingsTexture) {
-            Sprites[0].setTexture(Textures[0]);
-            OpenSettingsTexture = true;
-        }
-        
-        std::string String = "Fourier Depth:  " + std::to_string(depth) + 
-            "\n\nSmoothness:  " + std::to_string(smoothness) + "\n\nPoints:\t\t       " + 
-            std::to_string(points) + "\n\n     Reset\t\t\t   Draw";
-        Text text;
-        Font font;
-        font.loadFromFile("Resources/Fonts/arial.ttf");
-        text.setString(String);
-        text.setCharacterSize(12);
-        text.setFont(font);
-        text.setFillColor(Color::Black);
-        text.setPosition(Pos.x + 10.f, Pos.y + 35.f);
-        m_target.draw(Sprites[0]);
-        RenderButtons(Obj);
-        m_target.draw(text);
+void Renderer::RenderButton(Button& button) const
+{   
+    if (button.ToBe) {
+        if (button.sprite.getTexture() != &button.Textures[button.State])
+            button.sprite.setTexture(button.Textures[button.State]);
+        m_target.draw(button.sprite);
     }
 }
 
-void Renderer::RenderButton(Button* button) const
-{   
-    if (button->ToBe) {
-        button->sprite.setTexture(button->Textures[button->State]);
-        m_target.draw(button->sprite);
-    }
+void Renderer::RenderSprite(Sprite& sprite) const
+{
+    m_target.draw(sprite);
+}
+
+void Renderer::RenderTexts(std::vector<Text> Texts)
+{
+    int N = Texts.size();
+    for (int i = 0; i < N; i++)
+        m_target.draw(Texts[i]);
 }
 

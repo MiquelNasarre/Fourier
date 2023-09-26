@@ -18,7 +18,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SourceFiles\2dFourier.cpp">
+    <ClCompile Include="SourceFiles\Fourier.cpp">
       <Filter>Sources\Private</Filter>
     </ClCompile>
     <ClCompile Include="SourceFiles\Engine.cpp">
@@ -33,9 +33,12 @@
     <ClCompile Include="SourceFiles\Renderer.cpp">
       <Filter>Sources\Private</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\Settings.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeaderFiles\2dFourier.h">
+    <ClInclude Include="HeaderFiles\Fourier.h">
       <Filter>Sources\Public</Filter>
     </ClInclude>
     <ClInclude Include="HeaderFiles\Engine.h">
@@ -48,6 +51,9 @@
       <Filter>Sources\Public</Filter>
     </ClInclude>
     <ClInclude Include="HeaderFiles\Renderer.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Settings.h">
       <Filter>Sources\Public</Filter>
     </ClInclude>
   </ItemGroup>

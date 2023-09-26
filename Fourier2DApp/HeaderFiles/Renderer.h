@@ -16,19 +16,18 @@
 class Renderer
 {
 private:
-    RenderTarget&           m_target;
-    std::vector<Texture>    Textures;
-    std::vector<Sprite>     Sprites;
+    RenderTarget& m_target;
     float Scale = 200;
     bool OpenSettingsTexture = true;
+    Vector2i WindowPos;
 
 public:
     explicit
         Renderer(RenderTarget& target) : m_target{ target } {
     }
 
-    void InitializeTextures();
-    void render(Vector2i Pos, Objects Obj) const;
+    void SetWindowPos(Vector2i WinPos);
+    void renderPlain(Vector2i Pos) const;
     void ModifyScale(float increment);
     float getScale();
     static Vector2f R2Pos(Vector2f Pos, Vector2i ScreenPos, float scale);
@@ -40,10 +39,11 @@ public:
     void RenderMousePosition(Vector2i Pos) const;
     void RenderGrid() const;
     void RenderAxis() const;
-    void RenderCircles(Objects Obj, Vector2i Pos) const;
-    void RenderButtons(Objects Obj) const;
-    void RenderFunctions(Objects Obj) const;
-    void RenderCircleDescription(Objects Obj, int n, Vector2i Pos) const;
-    void RenderSettings(Vector2f Pos, bool State, int depth, int smoothness, int points, Objects Obj);
-    void RenderButton(Button* button) const;
+    void RenderPoint(Point P, int i) const;
+    void RenderButtons(std::vector<Button> Buttons);
+    void RenderFunction(PixelFunction& Function) const;
+    void RenderCircleDescription(Point P, int n) const;
+    void RenderButton(Button& button) const;
+    void RenderSprite(Sprite& sprite) const;
+    void RenderTexts(std::vector<Text> Texts);
 };
