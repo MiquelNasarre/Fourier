@@ -46,4 +46,5 @@ public:
     void RenderButton(Button& button) const;
     void RenderSprite(Sprite& sprite) const;
     void RenderTexts(std::vector<Text> Texts);
+    void RenderText(Text text);
 };

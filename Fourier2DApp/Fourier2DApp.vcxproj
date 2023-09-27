@@ -163,7 +163,9 @@
     <ClCompile Include="SourceFiles\Engine.cpp" />
     <ClCompile Include="SourceFiles\main.cpp" />
     <ClCompile Include="SourceFiles\Objects.cpp" />
+    <ClCompile Include="SourceFiles\Popup.cpp" />
     <ClCompile Include="SourceFiles\Renderer.cpp" />
+    <ClCompile Include="SourceFiles\Selector.cpp" />
     <ClCompile Include="SourceFiles\Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +173,9 @@
     <ClInclude Include="HeaderFiles\Engine.h" />
     <ClInclude Include="HeaderFiles\Header.h" />
     <ClInclude Include="HeaderFiles\Objects.h" />
+    <ClInclude Include="HeaderFiles\Popup.h" />
     <ClInclude Include="HeaderFiles\Renderer.h" />
+    <ClInclude Include="HeaderFiles\Selector.h" />
     <ClInclude Include="HeaderFiles\Settings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

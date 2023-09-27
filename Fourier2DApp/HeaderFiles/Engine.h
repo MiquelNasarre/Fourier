@@ -5,18 +5,21 @@
 #include "Renderer.h"
 #include "Fourier.h"
 #include "Settings.h"
+#include "Popup.h"
 
 #define StdKeyCooldown 8
 #define StdButtonCooldown 4
-#define DefaultInitialPoints 50
+#define DefaultInitialPoints 40
 #define DefaultPointsFunction 500
-#define DefaultFourierDepth 10
+#define DefaultFourierDepth 15
+#define InitialRadius  1 + ((float)TotalFouriersHad - 1) / 6
 
 class Engine {
 private:
 	std::vector<int> Values;
 	int KeyCooldown = 0;
 	int currentFourier = 0;
+	int TotalFouriersHad = 1;
 
 	Renderer* Rend;
 	std::vector<Fourier> fourier;
@@ -34,6 +37,8 @@ public:
 
 	void MainLoop();
 	void Reset();
+	void AddFourier();
+	void DeleteFourier();
 
 	void EventCheck(RenderWindow& window);
 	void KeyboardEventCheck();
@@ -42,7 +47,9 @@ public:
 	void WindowMovement(Vector2i NewWindowPosition);
 	void change();
 	bool fouriersOccupied();
-
+	void SetFourier(int N);
+	void LoadFromFile(std::string filename);
+	void SaveToFile(std::string filename);
 	
 	void ButtonsActions(int ButtonPressed);
 	

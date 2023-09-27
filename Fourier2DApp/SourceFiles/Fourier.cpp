@@ -17,6 +17,15 @@ void Fourier::CreateDataSet(std::string filename)
 	return;
 }
 
+Fourier::Fourier(std::vector<int> Values, float* x, float* y)
+{
+	for (int i = 0; i < Values[0]; i++)
+		Points.push_back(Point(Vector2f(x[i], y[i])));
+	S[0].N = Values[2];
+	GenerateS0();
+	GraphFunctionS0(Values[1]);
+}
+
 void Fourier::SetDepth(int d)
 {
 	for (int i = 0; i < NumOfSeries; i++) {
@@ -44,6 +53,11 @@ void Fourier::SetDescriptionsFalse()
 int Fourier::GetNumberPoints()
 {
 	return Points.size();
+}
+
+std::vector<int> Fourier::GetValues()
+{
+	return std::vector<int>({(int)Points.size(),F.N,S[0].N});
 }
 
 bool Fourier::IsOccupied()
@@ -110,12 +124,12 @@ void Fourier::GenerateS2()
 {
 }
 
-void Fourier::CreateDataSet(int n)
+void Fourier::CreateDataSet(int n, float r)
 {
 	Drawing = false;
 	Points.clear();
 	for (int i = 0; i < n; i++)
-		Points.push_back(Point(Vector2f((float)cos(2 * Pi / n * i), (float)sin(2 * Pi / n * i))));
+		Points.push_back(Point(Vector2f(r * (float)cos(2 * Pi / n * i), r * (float)sin(2 * Pi / n * i))));
 }
 
 void Fourier::AddPointstoDataSet(int Pts)
@@ -153,10 +167,19 @@ void Fourier::RenderPoints(Renderer& renderer)
 		renderer.RenderPoint(Points[i], i);
 }
 
+Vector2f Fourier::getPosition(int P)
+{
+	return Points[P].Position;
+}
+
 void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values)
 {
 	int Object = CheckCollision(MouseR2, Scale);
 	if (Drawing) {
+		if (Points.size()) {
+			Points[0].Color = RGBA('B');
+			Points[0].Radius = PointsRadius + 1.f;
+		}
 		if (Mouse::isButtonPressed(Mouse::Left)) {
 			if (Dragging >= 0) {
 				Points[Dragging].Position = MouseR2;
@@ -166,6 +189,8 @@ void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::v
 				if (Dragging == -3);
 				else if (Points.size() > 3 && Object == 0) {
 					Drawing = false;
+					Points[0].Color = PointsColor;
+					Points[0].Radius = PointsRadius;
 					return;
 				}
 				else {

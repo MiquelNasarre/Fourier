@@ -224,3 +224,8 @@ void Renderer::RenderTexts(std::vector<Text> Texts)
         m_target.draw(Texts[i]);
 }
 
+void Renderer::RenderText(Text text)
+{
+    m_target.draw(text);
+}
+

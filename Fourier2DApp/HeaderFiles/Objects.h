@@ -85,7 +85,8 @@ struct RGBA {
 	}
 };
 
-struct Point {
+class Point {
+public:
 	Vector2f Position;
 	float Radius;
 	RGBA Color;
@@ -128,5 +129,7 @@ public:
 	void setScale(float x, float y);
 	bool IsinPos(Vector2i MouseScPos);
 };
+
+
 
 void TransparentGreenScreen(Image* image);

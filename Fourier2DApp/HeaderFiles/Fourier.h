@@ -26,7 +26,7 @@ private:
 	PixelFunction F;
 	dataset S[3];
 	std::vector<Point> Points;
-	int Dragging;
+	int Dragging = -1;
 
 	double EvalX(double t);
 	double EvalY(double t);
@@ -34,6 +34,7 @@ private:
 public:
 
 	Fourier() {}
+	Fourier(std::vector<int> Values, float* x, float* y);
 
 	void SetDepth(int d);
 	void SetPointPosition(int n,  Vector2f Pos);
@@ -41,6 +42,7 @@ public:
 	void SetDescriptionsFalse();
 
 	int GetNumberPoints();
+	std::vector<int> GetValues();
 	bool IsOccupied();
 	bool IsDrawing();
 
@@ -51,11 +53,12 @@ public:
 	static float Distance2(Vector2f V0, Vector2f V1);
 
 	void CreateDataSet(std::string filename);
-	void CreateDataSet(int n);
+	void CreateDataSet(int n, float r = 1.f);
 	void AddPointstoDataSet(int Points);
 	void GraphFunctionS0(int N);
 	void RenderFunction(Renderer& renderer);
 	void RenderPoints(Renderer& renderer);
+	Vector2f getPosition(int P);
 
 	void FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values);
 	int CheckCollision(Vector2f MouseR2, float Scale);

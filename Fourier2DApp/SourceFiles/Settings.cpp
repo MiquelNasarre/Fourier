@@ -9,6 +9,8 @@ void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
 			Sidebar.setTexture(Textures[OpenedTexture]);
 			for (unsigned int i = 0; i < Buttons.size(); i++)
 				Buttons[i].ToBe = true;
+			for (unsigned int i = 0; i < Selectors.size(); i++)
+				Selectors[i].SetVisibility(true);
 			Change = true;
 		}
 		if (SidebarPos.x < 0) {
@@ -17,6 +19,7 @@ void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
 				Buttons[i].IncreasePosition(SlideVelocity, 0.f);
 			for (unsigned int i = 0; i < Texts.size(); i++)
 				Texts[i].setPosition(Texts[i].getPosition().x + SlideVelocity, Texts[i].getPosition().y);
+			Selectors[0].IncreasePosition(SlideVelocity, 0.f);
 			Change = true;
 		}
 	}
@@ -25,6 +28,8 @@ void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
 			Sidebar.setTexture(Textures[ClosedTexture]);
 			for (unsigned int i = 0; i < Buttons.size(); i++)
 				Buttons[i].ToBe = false;
+			for (unsigned int i = 0; i < Selectors.size(); i++)
+				Selectors[i].SetVisibility(false);
 			Change = true;
 		}
 		if (SidebarPos.x > -120.f) {
@@ -33,6 +38,7 @@ void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
 				Buttons[i].IncreasePosition(-SlideVelocity, 0.f);
 			for (unsigned int i = 0; i < Texts.size(); i++)
 				Texts[i].setPosition(Texts[i].getPosition().x - SlideVelocity, Texts[i].getPosition().y);
+			Selectors[0].IncreasePosition(-SlideVelocity, 0.f);
 			Change = true;
 		}
 	}
@@ -71,9 +77,9 @@ Settings::Settings() {
 	Texture texture;
 	image.loadFromFile("Resources/Textures/CustomButtons.png");
 	TransparentGreenScreen(&image);
-	texture.loadFromImage(image, IntRect(0, 104, 157, 352));
+	texture.loadFromImage(image, IntRect(0, 104, 157, 321));
 	Textures.push_back(texture);
-	texture.loadFromImage(image, IntRect(157, 104, 157, 352));
+	texture.loadFromImage(image, IntRect(157, 104, 157, 321));
 	Textures.push_back(texture);
 	Sidebar.setTexture(Textures[ClosedTexture]);
 	Sidebar.setPosition(DefaultSettingsPosition);
@@ -87,30 +93,35 @@ Settings::Settings() {
 	text.setCharacterSize(12);
 	text.setFillColor(Color::Black);
 
-	String = "Fourier Depth:\n\nSmoothness:\n\nPoints:\n\n     Reset\t\t\t   Draw";
+	String = "Fourier Depth:\n\nSmoothness:\n\nPoints:\n\n     Reset\t\t\t   Draw\n\n      New\t\t\t    Delete\n\n\n\n\n\n\n\n      Load\t\t\t    Save";
 	text.setString(String);
-	text.setPosition(DefaultSettingsPosition.x + 10.f, DefaultSettingsPosition.y + 35.f);
+	text.setPosition(DefaultSettingsPosition.x + 10.f, DefaultSettingsPosition.y + 35.f + MoveDown);
 	Texts.push_back(text);
 
 	String = '0';
 	text.setString(String);
-	text.setPosition(DefaultSettingsPosition.x + 100.f, DefaultSettingsPosition.y + 35.f);
 	Texts.push_back(text);
-	text.setString(String);
-	text.setPosition(DefaultSettingsPosition.x + 100.f, DefaultSettingsPosition.y + 64.f);
 	Texts.push_back(text);
-	text.setString(String);
-	text.setPosition(DefaultSettingsPosition.x + 100.f, DefaultSettingsPosition.y + 93.f);
 	Texts.push_back(text);
 
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(112, 3),Vector2i(112,36),Vector2i(112,69) }), Vector2i(38, 16), Vector2f(1.f, 0.7f), Vector2f(112.f - 120.f,  37.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(112,19),Vector2i(112,52),Vector2i(112,85) }), Vector2i(38, 16), Vector2f(1.f, 0.7f), Vector2f(112.f - 120.f,  49.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(112, 3),Vector2i(112,36),Vector2i(112,69) }), Vector2i(38, 16), Vector2f(1.f, 0.7f), Vector2f(112.f - 120.f,  65.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(112,19),Vector2i(112,52),Vector2i(112,85) }), Vector2i(38, 16), Vector2f(1.f, 0.7f), Vector2f(112.f - 120.f,  77.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(112, 3),Vector2i(112,36),Vector2i(112,69) }), Vector2i(38, 16), Vector2f(1.f, 0.7f), Vector2f(112.f - 120.f,  93.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(112,19),Vector2i(112,52),Vector2i(112,85) }), Vector2i(38, 16), Vector2f(1.f, 0.7f), Vector2f(112.f - 120.f, 105.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(  0, 3),Vector2i(  0,36),Vector2i(  0,69) }), Vector2i(89, 32), Vector2f(.75f,.75f), Vector2f(  7.f - 120.f, 120.f), false));
-	Buttons.push_back(Button("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(  0, 3),Vector2i(  0,36),Vector2i(  0,69) }), Vector2i(89, 32), Vector2f(.75f,.75f), Vector2f( 83.f - 120.f, 120.f), false));
+	Buttons.push_back(Button(UpButtonInitializer  , Vector2f(112.f - 120.f,  37.f + MoveDown), false));
+	Buttons.push_back(Button(DownButtonInitializer, Vector2f(112.f - 120.f,  49.f + MoveDown), false));
+	Buttons.push_back(Button(UpButtonInitializer  , Vector2f(112.f - 120.f,  65.f + MoveDown), false));
+	Buttons.push_back(Button(DownButtonInitializer, Vector2f(112.f - 120.f,  77.f + MoveDown), false));
+	Buttons.push_back(Button(UpButtonInitializer  , Vector2f(112.f - 120.f,  93.f + MoveDown), false));
+	Buttons.push_back(Button(DownButtonInitializer, Vector2f(112.f - 120.f, 105.f + MoveDown), false));
+	Buttons.push_back(Button(BigButtonInitializer , Vector2f(  7.f - 120.f, 120.f + MoveDown), false));
+	Buttons.push_back(Button(BigButtonInitializer , Vector2f( 83.f - 120.f, 120.f + MoveDown), false));
+	Buttons.push_back(Button(BigButtonInitializer , Vector2f(  7.f - 120.f, 148.f + MoveDown), false));
+	Buttons.push_back(Button(RedButtonInitializer , Vector2f( 83.f - 120.f, 148.f + MoveDown), false));
+	Buttons.push_back(Button(BlueButtonInitializer, Vector2f(  7.f - 120.f, 260.f + MoveDown), false));
+	Buttons.push_back(Button(BlueButtonInitializer, Vector2f( 83.f - 120.f, 260.f + MoveDown), false));
+	Buttons.push_back(Button(ColorButtonInitializer, Vector2f( 130.f - 120.f, 38.f), false));
+
+
+	Selectors.push_back(Selector(SelectorInitializer, Vector2f(3.f - 120.f, 37.f), true));
+	
+	Selectors[0].AddOption("Untitled 1");
 
 	IsOpen = false;
 
@@ -136,7 +147,7 @@ void Settings::SetValues(std::vector<int> values)
 	else
 		x = 0;
 	Texts[1].setString(String);
-	Texts[1].setPosition(Sidebar.getPosition().x + 100.f - 7.f * x, Sidebar.getPosition().y + 35.f);
+	Texts[1].setPosition(Sidebar.getPosition().x + 100.f - 7.f * x, Sidebar.getPosition().y + 35.f + MoveDown);
 	n = Values[PointsFunction];
 	String = std::to_string(n);
 	if (n)
@@ -144,7 +155,7 @@ void Settings::SetValues(std::vector<int> values)
 	else
 		x = 0;
 	Texts[2].setString(String);
-	Texts[2].setPosition(Sidebar.getPosition().x + 100.f - 7.f * x, Sidebar.getPosition().y + 64.f);
+	Texts[2].setPosition(Sidebar.getPosition().x + 100.f - 7.f * x, Sidebar.getPosition().y + 64.f + MoveDown);
 	n = Values[FourierPoints];
 	String = std::to_string(n);
 	if (n)
@@ -152,7 +163,7 @@ void Settings::SetValues(std::vector<int> values)
 	else
 		x = 0;
 	Texts[3].setString(String);
-	Texts[3].setPosition(Sidebar.getPosition().x + 100.f - 7.f * x, Sidebar.getPosition().y + 93.f);
+	Texts[3].setPosition(Sidebar.getPosition().x + 100.f - 7.f * x, Sidebar.getPosition().y + 93.f + MoveDown);
 
 	
 }
@@ -163,6 +174,7 @@ void Settings::DrawSettings(Renderer& renderer)
 	if (IsOpen) {
 		renderer.RenderButtons(Buttons);
 		renderer.RenderTexts(Texts);
+		Selectors[0].Render(renderer);
 	}
 	
 	return;
@@ -173,6 +185,8 @@ int Settings::SettingsEvents(Vector2i MouseScPos, bool Occupied, bool& PressingB
 	int Change = false;
 	Vector2f SidebarPos = Sidebar.getPosition();
 	MovementEvents(Change, SidebarPos);
+	int SelectorChange = Selectors[0].SelectorEvents(MouseScPos);
+	if (SelectorChange >= -1)return SelectorChange + 15;
 	if (!Occupied && IsOpen)
 		MouseEvents(Change, MouseScPos, PressingButton);
 
@@ -196,4 +210,29 @@ int Settings::SettingsEvents(Vector2i MouseScPos, bool Occupied, bool& PressingB
 		PressingButton = false;
 	}
 	return Change;
+}
+
+void Settings::DeleteSelected()
+{
+	Selectors[0].RemoveOption();
+}
+
+void Settings::EmptySelector()
+{
+	Selectors[0].RemoveAll();
+}
+
+void Settings::setSelector(int n)
+{
+	Selectors[0].SetCurrentSelected(n);
+}
+
+std::string Settings::getSelectorString(int N)
+{
+	return Selectors[0].getString(N);
+}
+
+void Settings::AddToSelector(std::string String)
+{
+	Selectors[0].AddOption(String);
 }

@@ -36,6 +36,12 @@
     <ClCompile Include="SourceFiles\Settings.cpp">
       <Filter>Sources\Private</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\Selector.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Popup.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeaderFiles\Fourier.h">
@@ -54,6 +60,12 @@
       <Filter>Sources\Public</Filter>
     </ClInclude>
     <ClInclude Include="HeaderFiles\Settings.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Selector.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Popup.h">
       <Filter>Sources\Public</Filter>
     </ClInclude>
   </ItemGroup>
