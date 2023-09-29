@@ -205,7 +205,7 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
                 }
                 else if (event.text.unicode == 8 && name.size())
                     name.pop_back();
-                else if ((int)name.size() < MaxSize && event.text.unicode != 8)
+                else if ((int)name.size() < MaxSize && event.text.unicode != 8 && event.text.unicode != 13)
                     name.push_back(event.text.unicode);
             }
         }
