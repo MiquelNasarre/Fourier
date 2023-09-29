@@ -34,16 +34,13 @@ public:
     static Vector2f R2Pos(Vector2f Pos, float Radius, float scale);
     static Vector2f ScPos(Vector2f Pos, float Radius, float scale);
     static Vector2f ScPos(Vector2f Pos, Vector2f Dimensions, float scale);
-    static Color ColorConvert(RGBA Col);
 
     void RenderMousePosition(Vector2i Pos) const;
     void RenderGrid() const;
     void RenderAxis() const;
     void RenderPoint(Point P, int i) const;
-    void RenderButtons(std::vector<Button> Buttons);
     void RenderFunction(PixelFunction& Function) const;
     void RenderCircleDescription(Point P, int n) const;
-    void RenderButton(Button& button) const;
     void RenderSprite(Sprite& sprite) const;
     void RenderTexts(std::vector<Text> Texts);
     void RenderText(Text text);

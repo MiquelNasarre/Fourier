@@ -2,6 +2,7 @@
 
 #include "Header.h"
 #include "Renderer.h"
+#include "Popup.h"
 
 class Selector {
 private:
@@ -12,10 +13,11 @@ private:
 	std::vector<Text> OptionTexts;
 	std::vector<Texture> TexMain, TexOption, TexCloser;
 
-	Sprite Main, Option, Closer;
+	Sprite Main, Closer;
+	std::vector<Sprite> OptionSprites;
 
 	bool Pressing = false;
-	int State = -2;
+	bool IsOpen = false;
 	bool ToBe;
 	int CurrentSelection = -1;
 
@@ -34,8 +36,10 @@ public:
 	void RemoveOption(Text text);
 	void RemoveOption(std::string String);
 	void SetCurrentSelected(int N);
-	void SetOptionName(std::string name);
+	void ChangeName(std::string name);
 	std::string getString(int N);
+	void ChangeOpen();
+	void SetToPosition();
 
 	void Render(Renderer &renderer);
 };

@@ -4,6 +4,8 @@
 #include "Objects.h"
 #include "Renderer.h"
 #include "Selector.h"
+#include "Button.h"
+#include "TickBox.h"
 
 #define DefaultSettingsPosition Vector2f(-120.f, 5.f)
 #define SlideVelocity 10.f
@@ -24,6 +26,7 @@ private:
 	std::vector<Font>		Fonts;
 	std::vector<Text>		Texts;
 	std::vector<int>		Values;
+	std::vector<TickBox>	Boxes;
 	
 	bool IsOpen;
 	unsigned char buttonCooldown;
@@ -33,7 +36,7 @@ private:
 	bool SettingsIcon(Vector2i& MouseScPos);
 
 public:
-	std::vector<Selector>   Selectors;
+	Selector selector;
 
 	static const int IncreaseDepth      = 2;
 	static const int DecreaseDepth      = 3;
@@ -47,7 +50,11 @@ public:
 	static const int Delete				=11;
 	static const int Load				=12;
 	static const int Save				=13;
-
+	static const int ColorSelector		=14;
+	static const int HidePoints			=15;
+	static const int ShowPoints			=16;
+	static const int HideFunction		=17;
+	static const int ShowFunction		=18;
 
 	Settings();
 	void SetValues(std::vector<int> values);
@@ -58,5 +65,7 @@ public:
 	void setSelector(int n);
 	std::string getSelectorString(int N);
 	void AddToSelector(std::string String);
+	void setPointsVisibility(bool T);
+	void setFunctionVisibility(bool T);
 
 };

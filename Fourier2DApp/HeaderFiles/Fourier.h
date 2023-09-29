@@ -24,31 +24,40 @@ class Fourier {
 private:
 	bool Drawing = false;
 	PixelFunction F;
-	dataset S[3];
+
+	Color FunctionColor;
+	dataset Coefficients;
 	std::vector<Point> Points;
 	int Dragging = -1;
+	bool PointsVisibility = true;
+	bool FunctionVisibility = true;
 
 	double EvalX(double t);
 	double EvalY(double t);
 
 public:
 
-	Fourier() {}
-	Fourier(std::vector<int> Values, float* x, float* y);
+	Fourier(Color color = Color::Red) : FunctionColor{ color } {}
+	Fourier(std::vector<int> Values, float* x, float* y, Color color = Color::Red);
 
 	void SetDepth(int d);
 	void SetPointPosition(int n,  Vector2f Pos);
 	void SetPointDescription(int n, bool Des);
 	void SetDescriptionsFalse();
+	void SetFunctionColor(Color Col);
+	void SetPointsVisibility(bool T);
+	void SetFunctionVisibility(bool T);
 
+
+	Color GetFunctionColor();
 	int GetNumberPoints();
 	std::vector<int> GetValues();
+	bool GetPointsVisibility();
+	bool GetFunctionVisibility();
 	bool IsOccupied();
 	bool IsDrawing();
 
 	void GenerateS0();
-	void GenerateS1();
-	void GenerateS2();
 
 	static float Distance2(Vector2f V0, Vector2f V1);
 

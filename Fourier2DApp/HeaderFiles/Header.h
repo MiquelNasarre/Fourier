@@ -15,6 +15,7 @@
 
 #define NumOfTexturesButtons 3
 #define MoveDown 30.f
+#define ArialFontFile "Resources/Fonts/arial.ttf"
 #define BigButtonInitializer	"Resources/Textures/CustomButtons.png", std::vector({ Vector2i(  0, 3),Vector2i(  0,36),Vector2i(  0,69) }), Vector2i(89, 32), Vector2f(.75f,.75f)
 #define RedButtonInitializer	"Resources/Textures/CustomButtons.png", std::vector({ Vector2i(157, 3),Vector2i(157,36),Vector2i(157,69) }), Vector2i(89, 32), Vector2f(.75f,.75f)
 #define BlueButtonInitializer	"Resources/Textures/CustomButtons.png", std::vector({ Vector2i(269, 3),Vector2i(269,36),Vector2i(269,69) }), Vector2i(89, 32), Vector2f(.75f,.75f)

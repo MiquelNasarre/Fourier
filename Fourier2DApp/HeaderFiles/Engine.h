@@ -19,7 +19,7 @@ private:
 	std::vector<int> Values;
 	int KeyCooldown = 0;
 	int currentFourier = 0;
-	int TotalFouriersHad = 1;
+	int TotalFouriersHad = 0;
 
 	Renderer* Rend;
 	std::vector<Fourier> fourier;
@@ -32,6 +32,7 @@ private:
 	bool SomethingHasChanged = true;
 	bool PressingButton = false;
 
+	Color ColorWheel(int n);
 public:
 	Engine();
 

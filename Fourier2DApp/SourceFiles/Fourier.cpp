@@ -17,11 +17,12 @@ void Fourier::CreateDataSet(std::string filename)
 	return;
 }
 
-Fourier::Fourier(std::vector<int> Values, float* x, float* y)
+Fourier::Fourier(std::vector<int> Values, float* x, float* y, Color color)
 {
+	FunctionColor = color;
 	for (int i = 0; i < Values[0]; i++)
 		Points.push_back(Point(Vector2f(x[i], y[i])));
-	S[0].N = Values[2];
+	Coefficients.N = Values[2];
 	GenerateS0();
 	GraphFunctionS0(Values[1]);
 }
@@ -29,7 +30,7 @@ Fourier::Fourier(std::vector<int> Values, float* x, float* y)
 void Fourier::SetDepth(int d)
 {
 	for (int i = 0; i < NumOfSeries; i++) {
-		S[i].N = d;
+		Coefficients.N = d;
 	}
 	return;
 }
@@ -50,6 +51,26 @@ void Fourier::SetDescriptionsFalse()
 		Points[i].Description = false;
 }
 
+void Fourier::SetFunctionColor(Color Col)
+{
+	FunctionColor = Col;
+}
+
+void Fourier::SetPointsVisibility(bool T)
+{
+	PointsVisibility = T;
+}
+
+void Fourier::SetFunctionVisibility(bool T)
+{
+	FunctionVisibility = T;
+}
+
+Color Fourier::GetFunctionColor()
+{
+	return FunctionColor;
+}
+
 int Fourier::GetNumberPoints()
 {
 	return Points.size();
@@ -57,7 +78,17 @@ int Fourier::GetNumberPoints()
 
 std::vector<int> Fourier::GetValues()
 {
-	return std::vector<int>({(int)Points.size(),F.N,S[0].N});
+	return std::vector<int>({(int)Points.size(),F.N,Coefficients.N});
+}
+
+bool Fourier::GetPointsVisibility()
+{
+	return PointsVisibility;
+}
+
+bool Fourier::GetFunctionVisibility()
+{
+	return FunctionVisibility;
 }
 
 bool Fourier::IsOccupied()
@@ -74,18 +105,18 @@ bool Fourier::IsDrawing()
 
 double Fourier::EvalX(double t)
 {
-	double x = S[0].X[0];
-	for (int i = 1; i < S[0].N; i++) {
-		x += S[0].X[i] * sin(i * t) + S[0].X[i + S[0].N] * cos(i * t);
+	double x = Coefficients.X[0];
+	for (int i = 1; i < Coefficients.N; i++) {
+		x += Coefficients.X[i] * sin(i * t) + Coefficients.X[i + Coefficients.N] * cos(i * t);
 	}
 	return x;
 }
 
 double Fourier::EvalY(double t)
 {
-	double y = S[0].Y[0];
-	for (int i = 1; i < S[0].N; i++) {
-		y += S[0].Y[i] * sin(i * t) + S[0].Y[i + S[0].N] * cos(i * t);
+	double y = Coefficients.Y[0];
+	for (int i = 1; i < Coefficients.N; i++) {
+		y += Coefficients.Y[i] * sin(i * t) + Coefficients.Y[i + Coefficients.N] * cos(i * t);
 	}
 	return y;
 }
@@ -98,30 +129,22 @@ float Fourier::Distance2(Vector2f V0, Vector2f V1)
 void Fourier::GenerateS0()
 {	
 	int N = Points.size();
-	S[0].X = (double*)calloc(S[0].N * sizeof(double), 2);
-	S[0].Y = (double*)calloc(S[0].N * sizeof(double), 2);
-	for (int n = 0; n < S[0].N; n++) {
+	Coefficients.X = (double*)calloc(Coefficients.N * sizeof(double), 2);
+	Coefficients.Y = (double*)calloc(Coefficients.N * sizeof(double), 2);
+	for (int n = 0; n < Coefficients.N; n++) {
 		for (int i = 0; i < N; i++) {
 			if (n == 0) {
-				S[0].X[n] += 1. / N * Points[i].Position.x;
-				S[0].Y[n] += 1. / N * Points[i].Position.y;
+				Coefficients.X[n] += 1. / N * Points[i].Position.x;
+				Coefficients.Y[n] += 1. / N * Points[i].Position.y;
 			}
 			else {
-				S[0].X[n] += 2. / N * Points[i].Position.x * sin(2 * Pi * i * n / N);
-				S[0].X[n + S[0].N] += 2. / N * Points[i].Position.x * cos(2 * Pi * i * n / N);
-				S[0].Y[n] += 2. / N * Points[i].Position.y * sin(2 * Pi * i * n / N);
-				S[0].Y[n + S[0].N] += 2. / N * Points[i].Position.y * cos(2 * Pi * i * n / N);
+				Coefficients.X[n] += 2. / N * Points[i].Position.x * sin(2 * Pi * i * n / N);
+				Coefficients.X[n + Coefficients.N] += 2. / N * Points[i].Position.x * cos(2 * Pi * i * n / N);
+				Coefficients.Y[n] += 2. / N * Points[i].Position.y * sin(2 * Pi * i * n / N);
+				Coefficients.Y[n + Coefficients.N] += 2. / N * Points[i].Position.y * cos(2 * Pi * i * n / N);
 			}
 		}
 	}
-}
-
-void Fourier::GenerateS1()
-{
-}
-
-void Fourier::GenerateS2()
-{
 }
 
 void Fourier::CreateDataSet(int n, float r)
@@ -146,11 +169,11 @@ void Fourier::GraphFunctionS0(int N)
 	F.N = N;
 	F.x = (float*)calloc(sizeof(float), N);
 	F.y = (float*)calloc(sizeof(float), N);
-	F.Color = (RGBA*)calloc(sizeof(RGBA), N);
+	F.color = (Color*)calloc(sizeof(Color), N);
 	for (int i = 0; i < N; i++) {
 		F.x[i] = (float)EvalX(2 * i * Pi / (N - 1));
 		F.y[i] = (float)EvalY(2 * i * Pi / (N - 1));
-		F.Color[i] = RGBA('R');
+		F.color[i] = FunctionColor;
 	}
 }
 
@@ -177,7 +200,7 @@ void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::v
 	int Object = CheckCollision(MouseR2, Scale);
 	if (Drawing) {
 		if (Points.size()) {
-			Points[0].Color = RGBA('B');
+			Points[0].color = Color::Blue;
 			Points[0].Radius = PointsRadius + 1.f;
 		}
 		if (Mouse::isButtonPressed(Mouse::Left)) {
@@ -189,7 +212,7 @@ void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::v
 				if (Dragging == -3);
 				else if (Points.size() > 3 && Object == 0) {
 					Drawing = false;
-					Points[0].Color = PointsColor;
+					Points[0].color = PointsColor;
 					Points[0].Radius = PointsRadius;
 					return;
 				}
@@ -208,7 +231,7 @@ void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::v
 		}
 		return;
 	}
-	S[0].N = Values[2];
+	Coefficients.N = Values[2];
 	F.N = Values[1];
 
 	if (Mouse::isButtonPressed(Mouse::Left)) {
@@ -257,6 +280,7 @@ int Fourier::CheckCollision(Vector2f MouseR2, float Scale)
 void Fourier::Draw()
 {
 	Drawing = true;
+	PointsVisibility = true;
 	Points.clear();
 	Dragging = -3;
 }

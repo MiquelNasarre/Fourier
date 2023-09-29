@@ -66,11 +66,6 @@ Vector2f Renderer::ScPos(Vector2f Pos, Vector2f Dimensions, float scale)
     return Vec;
 }
 
-Color Renderer::ColorConvert(RGBA Col)
-{
-    return Color(Col.R, Col.G, Col.B, Col.A);
-}
-
 void Renderer::RenderMousePosition(Vector2i Pos) const
 {
     RectangleShape Back(Vector2f(157.f, 14.f));
@@ -154,15 +149,8 @@ void Renderer::RenderPoint(Point P, int i) const
     CircleShape Circle;
     Circle.setPosition(ScPos(P.Position, P.Radius, Scale));
     Circle.setRadius(P.Radius);
-    Circle.setFillColor(ColorConvert(P.Color));
+    Circle.setFillColor(P.color);
     m_target.draw(Circle);
-}
-
-void Renderer::RenderButtons(std::vector<Button> Buttons)
-{
-    int N = Buttons.size();
-    for (int i = 0; i < N; i++)
-        RenderButton(Buttons[i]);
 }
 
 void Renderer::RenderFunction(PixelFunction& Function) const
@@ -170,8 +158,8 @@ void Renderer::RenderFunction(PixelFunction& Function) const
     for (int i = 0; i < Function.N - 1; i++) {
         Vertex t0 = ScPos(Vector2f(Function.x[i], Function.y[i]), 0, Scale);
         Vertex t1 = ScPos(Vector2f(Function.x[i + 1], Function.y[i + 1]), 0, Scale);
-        t0.color = ColorConvert(Function.Color[i]);
-        t1.color = ColorConvert(Function.Color[i + 1]);
+        t0.color = Function.color[i];
+        t1.color = Function.color[i + 1];
         Vertex line[] = { t0,t1 };
         m_target.draw(line, 2, Lines);
     }
@@ -201,15 +189,6 @@ void Renderer::RenderCircleDescription(Point P, int n) const
     text.setPosition((float)Mouse::getPosition().x - (float)WindowPos.x, (float)Mouse::getPosition().y - (float)WindowPos.y - 40.f);
     m_target.draw(text);
 
-}
-
-void Renderer::RenderButton(Button& button) const
-{   
-    if (button.ToBe) {
-        if (button.sprite.getTexture() != &button.Textures[button.State])
-            button.sprite.setTexture(button.Textures[button.State]);
-        m_target.draw(button.sprite);
-    }
 }
 
 void Renderer::RenderSprite(Sprite& sprite) const
