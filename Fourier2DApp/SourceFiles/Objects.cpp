@@ -29,3 +29,8 @@ bool InsideRectangle(Vector2i MousePos, Vector2f Position, Vector2i Size)
 	return false;
 }
 
+Vector2f IncreaseVector(Vector2f vector, float dx, float dy)
+{
+	return Vector2f(vector.x + dx, vector.y + dy);
+}
+

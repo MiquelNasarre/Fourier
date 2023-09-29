@@ -2,10 +2,12 @@
 
 bool Selector::isOnOption(int N, Vector2i MousePos)
 {
-	if (MousePos.x >= Position.x && MousePos.x < Position.x + DimOption.x && MousePos.y >= Position.y + DimMain.y + DimOption.y * N && MousePos.y < Position.y + DimMain.y + DimOption.y * (N + 1))
+	if (MousePos.x > Position.x && MousePos.x <= Position.x + DimOption.x && MousePos.y > Position.y + DimMain.y + DimOption.y * N && MousePos.y <= Position.y + DimMain.y + DimOption.y * (N + 1))
 		return true;
 	return false;
 }
+
+//	Public
 
 Selector::Selector(std::string TextureFile, std::vector<Vector2i> PosInFile, std::vector<Vector2i> SizeInFile, Vector2f position, bool Draw) {
 	ToBe = Draw;
@@ -52,54 +54,6 @@ void Selector::IncreasePosition(float dx, float dy)
 void Selector::SetVisibility(bool isOpen)
 {
 	ToBe = isOpen;
-}
-
-int Selector::SelectorEvents(Vector2i MousePos) {
-	if (Pressing && Mouse::isButtonPressed(Mouse::Left))
-		return -2;
-	else
-		Pressing = false;
-	if (MousePos.x >= Position.x && MousePos.x < Position.x + DimMain.x && MousePos.y >= Position.y && MousePos.y < Position.y + DimMain.y) {
-		if (MousePos.x > Position.x + 91.f && MousePos.x < Position.x + 105.f && Mouse::isButtonPressed(Mouse::Left) && IsOpen == false)
-			ChangeName(Popup::InputString());
-		if (MousePos.x > Position.x + 109.f && Mouse::isButtonPressed(Mouse::Left))
-			ChangeOpen();
-		else {
-			if (IsOpen && SetTexture(Main, TexMain[4]))
-				return -1;
-			else if (!IsOpen && SetTexture(Main, TexMain[1]))
-				return -1;
-				
-		}
-	}
-	else {
-		if (IsOpen)
-			SetTexture(Main, TexMain[3]);
-		else
-			SetTexture(Main, TexMain[0]);
-	}
-	if (Mouse::isButtonPressed(Mouse::Left))
-		Pressing = true;
-
-	if (IsOpen) {
-		for (int i = 0; i < (int)OptionTexts.size(); i++) {
-			if (isOnOption(i, MousePos)) {
-				if (Mouse::isButtonPressed(Mouse::Left)) {
-					CurrentSelection = i;
-					IsOpen = false;
-					return i;
-				}
-				else {
-					OptionSprites[i].setTexture(TexOption[1]);
-					return -1;
-				}
-			}
-			else {
-				OptionSprites[i].setTexture(TexOption[0]);
-			}
-		}
-	}
-	return -2;
 }
 
 void Selector::AddOption(Text text)
@@ -149,32 +103,6 @@ void Selector::RemoveOption(int N)
 	SetToPosition();
 }
 
-void Selector::RemoveOption(Text text)
-{
-	for (int i = 0; i < (int)OptionTexts.size(); i++) {
-		if (OptionTexts[i].getString() == text.getString()) {
-			OptionTexts.erase(OptionTexts.begin() + i);
-		}
-	}
-	CurrentSelection--;
-	if (CurrentSelection == -1 && OptionTexts.size())
-		CurrentSelection++;
-	SetToPosition();
-}
-
-void Selector::RemoveOption(std::string String)
-{
-	for (int i = 0; i < (int)OptionTexts.size(); i++) {
-		if (OptionTexts[i].getString() == String) {
-			OptionTexts.erase(OptionTexts.begin() + i);
-		}
-	}
-	CurrentSelection--;
-	if (CurrentSelection == -1 && OptionTexts.size())
-		CurrentSelection++;
-	SetToPosition();
-}
-
 void Selector::SetCurrentSelected(int N)
 {
 	CurrentSelection = N;
@@ -213,6 +141,59 @@ void Selector::SetToPosition()
 	Closer.setPosition(Position.x, Position.y + DimMain.y + DimOption.y * OptionTexts.size());
 }
 
+int Selector::EventCheck(Vector2i MousePos) {
+	if (Pressing && Mouse::isButtonPressed(Mouse::Left))
+		return -2;
+	else
+		Pressing = false;
+	if (InsideRectangle(MousePos,Position,DimMain)) {
+		if (MousePos.x > Position.x + 91.f &&
+			MousePos.x < Position.x + 105.f &&
+			Mouse::isButtonPressed(Mouse::Left) &&
+			IsOpen == false && CurrentSelection != -1)
+			ChangeName(Popup::InputString());
+		if (MousePos.x > Position.x + 109.f && Mouse::isButtonPressed(Mouse::Left))
+			ChangeOpen();
+		else {
+			if (IsOpen && SetTexture(Main, TexMain[4]))
+				return -1;
+			else if (!IsOpen && SetTexture(Main, TexMain[1]))
+				return -1;
+				
+		}
+	}
+	else {
+		if (IsOpen)
+			SetTexture(Main, TexMain[3]);
+		else
+			SetTexture(Main, TexMain[0]);
+	}
+	if (Mouse::isButtonPressed(Mouse::Left))
+		Pressing = true;
+
+	if (IsOpen) {
+		for (int i = 0; i < (int)OptionTexts.size(); i++) {
+			if (isOnOption(i, MousePos)) {
+				if (Mouse::isButtonPressed(Mouse::Left)) {
+					CurrentSelection = i;
+					IsOpen = false;
+					return i;
+				}
+				else {
+					OptionSprites[i].setTexture(TexOption[1]);
+					for (int j = i + 1; j < (int)OptionSprites.size(); j++)
+						SetTexture(OptionSprites[j], TexOption[0]);
+					return -1;
+				}
+			}
+			else {
+				OptionSprites[i].setTexture(TexOption[0]);
+			}
+		}
+	}
+	return -2;
+}
+
 void Selector::Render(Renderer& renderer)
 {
 	renderer.RenderSprite(Main);
@@ -227,4 +208,21 @@ void Selector::Render(Renderer& renderer)
 		renderer.RenderSprite(OptionSprites[i]);
 	renderer.RenderTexts(OptionTexts);
 	renderer.RenderSprite(Closer);
+}
+
+void Selector::Render(RenderWindow& window)
+{
+	window.draw(Main);
+	if (OptionTexts.size()) {
+		OptionTexts[CurrentSelection].setPosition(Position.x + 6.f, Position.y + 4.f);
+		window.draw(OptionTexts[CurrentSelection]);
+		OptionTexts[CurrentSelection].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * CurrentSelection + 2.f);
+	}
+	if (!IsOpen)
+		return;
+	for (int i = 0; i < (int)OptionTexts.size(); i++) {
+		window.draw(OptionSprites[i]);
+		window.draw(OptionTexts[i]);
+	}
+	window.draw(Closer);
 }

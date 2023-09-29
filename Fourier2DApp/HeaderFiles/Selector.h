@@ -3,6 +3,7 @@
 #include "Header.h"
 #include "Renderer.h"
 #include "Popup.h"
+#include "Objects.h"
 
 class Selector {
 private:
@@ -22,24 +23,26 @@ private:
 	int CurrentSelection = -1;
 
 	bool isOnOption(int N, Vector2i MousePos);
+	void SetToPosition();
 
 public:
 	Selector(std::string TextureFile, std::vector<Vector2i> PosInFile, std::vector<Vector2i> SizeInFile, Vector2f position = Vector2f(0.f, 0.f), bool Draw = true);
+
+	std::string getString(int N);
+
 	void SetVisibility(bool isOpen);
+	void SetCurrentSelected(int N);
+	void ChangeOpen();
 	void IncreasePosition(float dx, float dy);
-	int SelectorEvents(Vector2i MousePos);
+	void ChangeName(std::string name);
+	
 	void AddOption(Text text);
 	void AddOption(std::string String);
 	void RemoveAll();
 	void RemoveOption();
 	void RemoveOption(int N);
-	void RemoveOption(Text text);
-	void RemoveOption(std::string String);
-	void SetCurrentSelected(int N);
-	void ChangeName(std::string name);
-	std::string getString(int N);
-	void ChangeOpen();
-	void SetToPosition();
-
-	void Render(Renderer &renderer);
+	
+	int EventCheck(Vector2i MousePos);
+	void Render(Renderer& renderer);
+	void Render(RenderWindow& window);
 };

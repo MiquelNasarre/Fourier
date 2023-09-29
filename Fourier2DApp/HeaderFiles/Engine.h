@@ -31,6 +31,7 @@ private:
 	bool SettingsOpen = false;
 	bool SomethingHasChanged = true;
 	bool PressingButton = false;
+	bool ShowGrid = true;
 
 	Color ColorWheel(int n);
 public:
@@ -40,6 +41,7 @@ public:
 	void Reset();
 	void AddFourier();
 	void DeleteFourier();
+	void DuplicateFourier();
 
 	void EventCheck(RenderWindow& window);
 	void KeyboardEventCheck();

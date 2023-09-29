@@ -172,11 +172,8 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
     text.setFont(font);
     text.setFillColor(Color::Black);
     text.setCharacterSize(15);
-    Button Cancel("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(8.f, 50.f));
-    Button Enter("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(160.f, 50.f));
-    Text ButtonText("Cancel\t\t\t\t\t\t   Enter", font, 16);
-    ButtonText.setPosition(48.f, 56.f);
-    ButtonText.setFillColor(Color::Black);
+    Button Cancel("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(8.f, 50.f), true,"Cancel",Vector2f(40.f,6.f),font,16);
+    Button Enter("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(160.f, 50.f), true, "Enter", Vector2f(47.f, 6.f), font, 16);
     Texture TexBack;
     TexBack.loadFromFile("Resources/Textures/CustomButtons.png", IntRect(0, 36, 89, 32));
     Sprite BackText(TexBack);
@@ -220,7 +217,6 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
         window.draw(text);
         Cancel.Render(renderer);
         Enter.Render(renderer);
-        window.draw(ButtonText);
         window.display();
     }
 

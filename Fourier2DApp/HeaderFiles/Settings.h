@@ -12,7 +12,6 @@
 #define DefaultButtonCooldown 6
 #define OpenedTexture 0
 #define ClosedTexture 1
-
 #define FourierPoints	0
 #define PointsFunction	1
 #define FourierDepth	2
@@ -27,13 +26,13 @@ private:
 	std::vector<Text>		Texts;
 	std::vector<int>		Values;
 	std::vector<TickBox>	Boxes;
-	
+
 	bool IsOpen;
 	unsigned char buttonCooldown;
+	bool Freeze = false;
 
 	void MovementEvents(int& Change, Vector2f &SidebarPos);
 	void MouseEvents(int& Change, Vector2i& MouseScPos, bool& PressingButton);
-	bool SettingsIcon(Vector2i& MouseScPos);
 
 public:
 	Selector selector;
@@ -55,17 +54,17 @@ public:
 	static const int ShowPoints			=16;
 	static const int HideFunction		=17;
 	static const int ShowFunction		=18;
+	static const int HideGrid			=19;
+	static const int ShowGrid			=20;
 
 	Settings();
-	void SetValues(std::vector<int> values);
-	void DrawSettings(Renderer& renderer);
-	int SettingsEvents(Vector2i MouseScPos, bool Occupied, bool& PressingButton);
-	void DeleteSelected();
-	void EmptySelector();
-	void setSelector(int n);
-	std::string getSelectorString(int N);
-	void AddToSelector(std::string String);
+
+	void setValues(std::vector<int> &values);
 	void setPointsVisibility(bool T);
 	void setFunctionVisibility(bool T);
+	void close();
+	void open();
 
+	int EventCheck(Vector2i MouseScPos, bool Occupied, bool& PressingButton);
+	void Render(Renderer& renderer);
 };

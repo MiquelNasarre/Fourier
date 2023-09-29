@@ -7,11 +7,8 @@ void Renderer::SetWindowPos(Vector2i WinPos)
 
 void Renderer::renderPlain(Vector2i Pos) const
 {
-    m_target.clear(Color::White);
-
     RenderAxis();
     RenderGrid();
-    RenderMousePosition(Pos);
 }
 
 void Renderer::ModifyScale(float increment)

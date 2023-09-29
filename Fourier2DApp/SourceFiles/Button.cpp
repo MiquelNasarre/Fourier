@@ -27,6 +27,23 @@ Button::Button(std::string TextureFile, std::vector<Vector2i> PosInFile, Vector2
 	text.setPosition(Position.x + textPos.x, Position.y + textPos.y);
 }
 
+Button::Button(const Button& other)
+{
+	Position = other.Position;
+	Dimensions = other.Dimensions;
+	Textures = other.Textures;
+	sprite = other.sprite;
+	Scale = other.Scale;
+	State = other.State;
+	Visibility = other.Visibility;
+	sprite.setTexture(Textures[0]);
+	textFont = other.textFont;
+	textPos = other.textPos;
+	text = other.text;
+	text.setFont(textFont);
+	text.setPosition(other.text.getPosition());
+}
+
 Vector2f Button::GetPosition()
 {
 	return Position;
@@ -51,12 +68,28 @@ void Button::setPosition(Vector2f Pos)
 {
 	Position = Pos;
 	sprite.setPosition(Position);
+	text.setPosition(Pos.x + textPos.x, Pos.y + textPos.y);
 }
 
 void Button::setPosition(float x, float y)
 {
 	Position = Vector2f(x, y);
 	sprite.setPosition(Position);
+	text.setPosition(x + textPos.x, y + textPos.y);
+}
+
+void Button::IncreasePosition(Vector2f Diff)
+{
+	Position = Vector2f(Position.x + Diff.x, Position.y + Diff.y);
+	sprite.setPosition(Position);
+	text.setPosition(Position.x + textPos.x, Position.y + textPos.y);
+}
+
+void Button::IncreasePosition(float dx, float dy)
+{
+	Position = Vector2f(Position.x + dx, Position.y + dy);
+	sprite.setPosition(Position);
+	text.setPosition(Position.x + textPos.x, Position.y + textPos.y);
 }
 
 void Button::setVisibility(bool V)
@@ -64,24 +97,15 @@ void Button::setVisibility(bool V)
 	Visibility = V;
 }
 
-void Button::IncreasePosition(Vector2f Diff)
+void Button::setTexture(int t)
 {
-	Position = Vector2f(Position.x + Diff.x, Position.y + Diff.y);
-	sprite.setPosition(Position);
-}
-
-void Button::IncreasePosition(float dx, float dy)
-{
-	Position = Vector2f(Position.x + dx, Position.y + dy);
-	sprite.setPosition(Position);
+	sprite.setTexture(Textures[t]);
+	State = t + 1;
 }
 
 int Button::ButtonEvents(Vector2i MouseScPos)
 {
-	if ((float)MouseScPos.x > Position.x &&
-		(float)MouseScPos.y > Position.y &&
-		(float)MouseScPos.x <= Position.x + Dimensions.x &&
-		(float)MouseScPos.y <= Position.y + Dimensions.y) {
+	if (InsideRectangle(MouseScPos,Position,(Vector2i)Dimensions)) {
 		if (Mouse::isButtonPressed(Mouse::Left)) {
 			if (State == 3 || State == -3)
 				State = -3;

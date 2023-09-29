@@ -46,18 +46,23 @@ void Engine::MainLoop()
     Uint8 P[2] = { (Uint8)0xffffff,(Uint8)0xffffff };
     window.setIcon(1, 2, P);
 
+    settings.open();
+
     while (window.isOpen())
     {
         EventCheck(window);
         if (window.hasFocus() && SomethingHasChanged) {
-            renderer.renderPlain(window.getPosition());
+            window.clear(Color::White);
+            if(ShowGrid)
+                renderer.renderPlain(window.getPosition());
+            renderer.RenderMousePosition(window.getPosition());
             for (int i = 0; i < (int)fourier.size(); i++) {
                 if(fourier[i].GetFunctionVisibility())
                     fourier[i].RenderFunction(renderer);
             }
             if (currentFourier != -1 && fourier[currentFourier].GetPointsVisibility())
                 fourier[currentFourier].RenderPoints(renderer);
-            settings.DrawSettings(renderer);
+            settings.Render(renderer);
             window.display();
         }
         else {
@@ -79,8 +84,8 @@ void Engine::EventCheck(RenderWindow& window)
     // Everrything to do with settings events
     if (currentFourier!=-1 && fourier[currentFourier].IsDrawing())
         Values[FourierPoints] = fourier[currentFourier].GetNumberPoints();
-    settings.SetValues(Values);
-    ButtonsActions(settings.SettingsEvents(MouseWindowPosition(), fouriersOccupied(), PressingButton));
+    settings.setValues(Values);
+    ButtonsActions(settings.EventCheck(MouseWindowPosition(), fouriersOccupied(), PressingButton));
 
     // Everything to do with function events
     if (!PressingButton && currentFourier != -1)
@@ -168,14 +173,14 @@ void Engine::AddFourier()
     settings.setPointsVisibility(true);
     settings.setFunctionVisibility(true);
     std::string String = "Untitled " + std::to_string(TotalFouriersHad);
-    settings.AddToSelector(String);
+    settings.selector.AddOption(String);
 }
 
 void Engine::DeleteFourier()
 {
     if (currentFourier == -1)
         return;
-    settings.DeleteSelected();
+    settings.selector.RemoveOption();
     fourier.erase(fourier.begin() + currentFourier);
     if (fourier.size()) {
         if (currentFourier)
@@ -192,6 +197,19 @@ void Engine::DeleteFourier()
         settings.setFunctionVisibility(false);
     }
         
+}
+
+void Engine::DuplicateFourier()
+{
+    std::string String = settings.selector.getString(currentFourier);
+    if (String.substr(0, 6) != "(Copy)")
+        String = "(Copy)" + String;
+    while (String.size() > 16)
+        String.pop_back();
+    settings.selector.AddOption(String);
+    fourier.push_back(fourier[currentFourier]);
+    currentFourier = fourier.size() - 1;
+    
 }
 
 Vector2i Engine::MouseWindowPosition()
@@ -240,7 +258,7 @@ void Engine::LoadFromFile(std::string filename)
     if (!file)
         return;
     fourier.clear();
-    settings.EmptySelector();
+    settings.selector.RemoveAll();
     int N = 0;
     std::string Name;
     fscanf(file, "Number of functions: %i %i\n", &N, &currentFourier);
@@ -269,11 +287,11 @@ void Engine::LoadFromFile(std::string filename)
         fourier[i].SetPointsVisibility(v0);
         fourier[i].SetFunctionVisibility(v1);
         TotalFouriersHad++;
-        settings.AddToSelector(Name);
+        settings.selector.AddOption(Name);
     }
     fclose(file);
     SetFourier(currentFourier);
-    settings.setSelector(currentFourier);
+    settings.selector.SetCurrentSelected(currentFourier);
     return;
 }
 
@@ -286,7 +304,7 @@ void Engine::SaveToFile(std::string filename)
     fprintf(file, "Number of functions: %i %i\n", fourier.size(), currentFourier);
     for (int i = 0; i < (int)fourier.size(); i++) {
         std::vector<int> iValues = fourier[i].GetValues();
-        std::string FunctionName = settings.getSelectorString(i);
+        std::string FunctionName = settings.selector.getString(i);
         Color color = fourier[i].GetFunctionColor();
         fprintf(file, "%s\n%hhi %hhi\nFourier Depth: %i\nSmoothness: %i\nPoints: %i\nColor: %hhi %hhi %hhi %hhi\n", FunctionName.c_str(),fourier[i].GetPointsVisibility(), fourier[i].GetFunctionVisibility(), iValues[2], iValues[1], iValues[0], color.r, color.g, color.b, color.a);
         for (int j = 0; j < iValues[0]; j++)
@@ -297,44 +315,87 @@ void Engine::SaveToFile(std::string filename)
 
 void Engine::ButtonsActions(int ButtonPressed)
 {
-    if (ButtonPressed)
-        change();
-    if (ButtonPressed == Settings::IncreaseDepth && currentFourier != -1)
-        Values[FourierDepth]++;
-    else if (ButtonPressed == Settings::DecreaseDepth && Values[FourierDepth] > 2 && currentFourier != -1)
-        Values[FourierDepth]--;
-    else if (ButtonPressed == Settings::IncreaseSmoothness && currentFourier != -1)
-        Values[PointsFunction] += 10;
-    else if (ButtonPressed == Settings::DecreaseSmoothness && Values[PointsFunction] > 10 && currentFourier != -1)
-        Values[PointsFunction] -= 10;
-    else if (ButtonPressed == Settings::IncreasePoints && currentFourier != -1)
-        fourier[currentFourier].AddPointstoDataSet(++Values[FourierPoints]);
-    else if (ButtonPressed == Settings::DecreasePoints && currentFourier != -1 && Values[FourierPoints] > 3)
-        fourier[currentFourier].AddPointstoDataSet(--Values[FourierPoints]);
-    else if (ButtonPressed == Settings::Reset)
-        Reset();
-    else if (ButtonPressed == Settings::Draw && currentFourier != -1) {
-        fourier[currentFourier].Draw();
-        settings.setPointsVisibility(true);
-    }
-    else if (ButtonPressed == Settings::New)
+    if (!ButtonPressed)
+        return;
+    change();
+    switch (ButtonPressed)
+    {
+    case(Settings::IncreaseDepth):
+        if (currentFourier != -1)
+            Values[FourierDepth]++;
+        return;
+    case(Settings::DecreaseDepth):
+        if (currentFourier != -1)
+            Values[FourierDepth]--;
+        return;
+    case(Settings::IncreaseSmoothness):
+        if (currentFourier != -1)
+            Values[PointsFunction] += 10;
+        return;
+    case(Settings::DecreaseSmoothness):
+        if (currentFourier != -1)
+            Values[PointsFunction] -= 10;
+        return;
+    case(Settings::IncreasePoints):
+        if (currentFourier != -1)
+            fourier[currentFourier].AddPointstoDataSet(++Values[FourierPoints]);
+        return;
+    case(Settings::DecreasePoints):
+        if (currentFourier != -1)
+            fourier[currentFourier].AddPointstoDataSet(--Values[FourierPoints]);
+        return;
+    case(Settings::Reset):
+        if (currentFourier != -1)
+            DuplicateFourier();
+        return;
+    case(Settings::Draw):
+        if (currentFourier != -1) {
+            fourier[currentFourier].Draw();
+            settings.setPointsVisibility(true);
+            settings.close();
+        }
+        return;
+    case(Settings::Delete):
+        if (currentFourier != -1)
+            DeleteFourier();
+        return;
+    case(Settings::Save):
+        if (currentFourier != -1)
+            SaveToFile(Popup::InputString("Choosa a file name", 50));
+        return;
+    case(Settings::ColorSelector):
+        if (currentFourier != -1)
+            fourier[currentFourier].SetFunctionColor(Popup::ColorSelection(fourier[currentFourier].GetFunctionColor()));
+        return;
+    case(Settings::HidePoints):
+        if (currentFourier != -1)
+            fourier[currentFourier].SetPointsVisibility(false);
+        return;
+    case(Settings::ShowPoints):
+        if (currentFourier != -1)
+            fourier[currentFourier].SetPointsVisibility(true);
+        return;
+    case(Settings::HideFunction):
+        if (currentFourier != -1)
+            fourier[currentFourier].SetFunctionVisibility(false);
+        return;
+    case(Settings::ShowFunction):
+        if (currentFourier != -1)
+            fourier[currentFourier].SetFunctionVisibility(true);
+        return;
+    case(Settings::New):
         AddFourier();
-    else if (ButtonPressed == Settings::Delete)
-        DeleteFourier();
-    else if (ButtonPressed == Settings::Load)
+        return;
+    case(Settings::Load):
         LoadFromFile(Popup::InputString("Name of the file", 50));
-    else if (ButtonPressed == Settings::Save)
-        SaveToFile(Popup::InputString("Choosa a file name", 50));
-    else if (ButtonPressed == Settings::ColorSelector)
-        fourier[currentFourier].SetFunctionColor(Popup::ColorSelection(fourier[currentFourier].GetFunctionColor()));
-    else if (ButtonPressed == Settings::HidePoints)
-        fourier[currentFourier].SetPointsVisibility(false);
-    else if (ButtonPressed == Settings::ShowPoints)
-        fourier[currentFourier].SetPointsVisibility(true);
-    else if (ButtonPressed == Settings::HideFunction)
-        fourier[currentFourier].SetFunctionVisibility(false);
-    else if (ButtonPressed == Settings::ShowFunction)
-        fourier[currentFourier].SetFunctionVisibility(true);
-    else if (ButtonPressed >= 30)
+        return;
+    case(Settings::HideGrid):
+        ShowGrid = false;
+        return;
+    case(Settings::ShowGrid):
+        ShowGrid = true;
+        return;
+    }
+    if (ButtonPressed >= 30)
         SetFourier(ButtonPressed - 30);
 }
