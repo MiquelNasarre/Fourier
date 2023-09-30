@@ -19,6 +19,7 @@ private:
 	int Maximum;
 	int Minimum;
 	bool Pressed = false;
+	bool JustPressed = false;
 
 public:
 	NumberBar(std::string Filename, std::vector<Vector2i> TextureLocations, Vector2i Size, Vector2f position, int Max, int Minimum, int Initial = 0, Font InitialFont = Font());

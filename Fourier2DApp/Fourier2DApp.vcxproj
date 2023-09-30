@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SourceFiles\Blender.cpp" />
     <ClCompile Include="SourceFiles\Button.cpp" />
     <ClCompile Include="SourceFiles\Fourier.cpp" />
     <ClCompile Include="SourceFiles\Engine.cpp" />
@@ -170,8 +171,10 @@
     <ClCompile Include="SourceFiles\Selector.cpp" />
     <ClCompile Include="SourceFiles\Settings.cpp" />
     <ClCompile Include="SourceFiles\TickBox.cpp" />
+    <ClCompile Include="SourceFiles\TimeFourier.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HeaderFiles\Blender.h" />
     <ClInclude Include="HeaderFiles\Button.h" />
     <ClInclude Include="HeaderFiles\Fourier.h" />
     <ClInclude Include="HeaderFiles\Engine.h" />
@@ -183,6 +186,7 @@
     <ClInclude Include="HeaderFiles\Selector.h" />
     <ClInclude Include="HeaderFiles\Settings.h" />
     <ClInclude Include="HeaderFiles\TickBox.h" />
+    <ClInclude Include="HeaderFiles\TimeFourier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

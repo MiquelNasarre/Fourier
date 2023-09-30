@@ -21,7 +21,7 @@ private:
 	bool					Visibility;
 
 public:
-
+	Button() {}
 	Button(std::string TextureFile, std::vector<Vector2i> PosInFile, Vector2i SizeInFile, Vector2f scale, Vector2f position = Vector2f(0.f, 0.f), bool Draw = true, std::string textStr = "", Vector2f textPosition = Vector2f(0.f, 0.f), Font font = Font(), int characterSize = 14, Color FillColor = Color::Black);
 	Button(const Button& other);
 
@@ -37,7 +37,11 @@ public:
 	void setVisibility(bool V);
 	void setTexture(int t);
 
-	int ButtonEvents(Vector2i MouseScPos);
+	void setTextures(std::vector<Texture> textures);
+	void setFont(Font font);
+	void setString(std::string String);
+
+	int EventCheck(Vector2i MouseScPos);
 	void Render(Renderer& renderer);
 	void Render(RenderWindow& window);
 };

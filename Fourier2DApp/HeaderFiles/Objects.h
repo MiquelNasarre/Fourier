@@ -22,9 +22,9 @@ public:
 
 struct PixelFunction {
 	int N;
-	float* x;
-	float* y;
-	Color* color;
+	float* x = NULL;
+	float* y = NULL;
+	Color* color = NULL;
 };
 
 void TransparentGreenScreen(Image* image);

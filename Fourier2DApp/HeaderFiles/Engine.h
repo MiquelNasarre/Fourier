@@ -6,6 +6,7 @@
 #include "Fourier.h"
 #include "Settings.h"
 #include "Popup.h"
+#include "Blender.h"
 
 #define StdKeyCooldown 8
 #define StdButtonCooldown 4
@@ -24,6 +25,7 @@ private:
 	Renderer* Rend;
 	std::vector<Fourier> fourier;
 	Settings settings;
+	Blender blender;
 
 	Vector2f SettingsPosition = DefaultSettingsPosition;
 	Vector2i WindowPosition = Vector2i(0, 0);
@@ -34,10 +36,7 @@ private:
 	bool ShowGrid = true;
 
 	Color ColorWheel(int n);
-public:
-	Engine();
 
-	void MainLoop();
 	void Reset();
 	void AddFourier();
 	void DeleteFourier();
@@ -55,5 +54,8 @@ public:
 	void SaveToFile(std::string filename);
 	
 	void ButtonsActions(int ButtonPressed);
-	
+
+public:
+	Engine();
+	void MainLoop();
 };

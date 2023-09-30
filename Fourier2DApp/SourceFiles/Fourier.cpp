@@ -1,25 +1,7 @@
 #include "Fourier.h"
 
-void Fourier::CreateDataSet(std::string filename)
+Fourier::Fourier(std::vector<int> Values, float* x, float* y, std::string name, Color color) : Name{ name }, FunctionColor{ color }
 {
-	std::string FileLocation = filename + ".dat";
-	FILE* file = fopen(FileLocation.c_str(), "r");
-	int i = 0;
-	float s;
-	while (fscanf(file, "%f %f\n",&s,&s) != EOF)i++;
-
-	float x, y;
-	fseek(file, 0, 0);
-	for (int j = 0; j < i; j++) {
-		fscanf(file, "%f %f\n", &x, &y);
-		Points.push_back(Point(Vector2f(x, y)));
-	}
-	return;
-}
-
-Fourier::Fourier(std::vector<int> Values, float* x, float* y, Color color)
-{
-	FunctionColor = color;
 	for (int i = 0; i < Values[0]; i++)
 		Points.push_back(Point(Vector2f(x[i], y[i])));
 	Coefficients.N = Values[2];
@@ -45,10 +27,15 @@ void Fourier::SetPointDescription(int n, bool Des)
 	Points[n].Description = Des;
 }
 
-void Fourier::SetDescriptionsFalse()
+bool Fourier::SetDescriptionsFalse()
 {
-	for (int i = 0; i < (int)Points.size(); i++)
-		Points[i].Description = false;
+	for (int i = 0; i < (int)Points.size(); i++) {
+		if (Points[i].Description) {
+			Points[i].Description = false;
+			return true;
+		}
+	}
+	return false;
 }
 
 void Fourier::SetFunctionColor(Color Col)
@@ -66,6 +53,16 @@ void Fourier::SetFunctionVisibility(bool T)
 	FunctionVisibility = T;
 }
 
+void Fourier::setName(std::string name)
+{
+	Name = name;
+}
+
+dataset* Fourier::getCoefficients()
+{
+	return &Coefficients;
+}
+
 Color Fourier::GetFunctionColor()
 {
 	return FunctionColor;
@@ -74,6 +71,11 @@ Color Fourier::GetFunctionColor()
 int Fourier::GetNumberPoints()
 {
 	return Points.size();
+}
+
+std::string Fourier::getName()
+{
+	return Name;
 }
 
 std::vector<int> Fourier::GetValues()
@@ -195,7 +197,7 @@ Vector2f Fourier::getPosition(int P)
 	return Points[P].Position;
 }
 
-void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values)
+void Fourier::EventCheck(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values)
 {
 	int Object = CheckCollision(MouseR2, Scale);
 	if (Drawing) {
@@ -257,11 +259,11 @@ void Fourier::FunctionEvents(bool& Change, Vector2f MouseR2, float Scale, std::v
 			SetPointDescription(Object, true);
 			Change = true;
 		}
-		else {
-			SetDescriptionsFalse();
+		else if (SetDescriptionsFalse())
 			Change = true;
-		}
 	}
+	if (F.color && FunctionColor != F.color[0])
+		Change = true;
 	if (Change) {
 		GenerateS0();
 		GraphFunctionS0(F.N);

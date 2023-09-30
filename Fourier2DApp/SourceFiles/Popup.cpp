@@ -184,14 +184,19 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
     window.setFramerateLimit(60);
     Renderer renderer(window);
 
+    Image icon;
+    icon.loadFromFile("Resources/Textures/TextPopupIcon.png");
+    TransparentGreenScreen(&icon);
+    window.setIcon(20, 20, icon.getPixelsPtr());
+
     std::string name;
 
     while (window.isOpen()) {
         window.setActive();
         window.requestFocus();
-        if (Cancel.ButtonEvents(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) ==3)
+        if (Cancel.EventCheck(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) ==3)
             return "";
-        if (Enter.ButtonEvents(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) == 3)
+        if (Enter.EventCheck(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) == 3)
             return name;
 
         Event event;
@@ -293,13 +298,18 @@ Color Popup::ColorSelection(Color Current)
 
     Vector2i MousePos;
     RenderWindow window(VideoMode(370, 350), "Color Selector", sf::Style::Titlebar | sf::Style::Close);
+
+    Image icon;
+    icon.loadFromFile("Resources/Textures/ColorPopupIcon.png");
+    TransparentGreenScreen(&icon);
+    window.setIcon(20, 20, icon.getPixelsPtr());
     
     window.setFramerateLimit(60);
 
     while (window.isOpen()) {
         MousePos = MousePosition(window);
         window.requestFocus();
-        if (EnterButton.ButtonEvents(MousePos) == 3)
+        if (EnterButton.EventCheck(MousePos) == 3)
             return currentColor;
         Event event;
         while (window.pollEvent(event)) {

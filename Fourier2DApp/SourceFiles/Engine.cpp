@@ -22,58 +22,6 @@ Color Engine::ColorWheel(int n)
     return Color();
 }
 
-//  Public
-
-Engine::Engine()
-{   
-    Values.push_back(DefaultInitialPoints);
-    Values.push_back(DefaultPointsFunction);
-    Values.push_back(DefaultFourierDepth);
-    fourier.push_back(Fourier(ColorWheel(TotalFouriersHad)));
-    fourier[0].CreateDataSet(Values[FourierPoints]);
-    TotalFouriersHad++;
-}
-
-void Engine::MainLoop()
-{
-    RenderWindow window(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", Style::Default);
-    window.setPosition(InitialWinPos);
-    Renderer renderer(window);
-    Rend = &renderer;
-    window.setFramerateLimit(60);
-
-    //  Posali una icona mes guai
-    Uint8 P[2] = { (Uint8)0xffffff,(Uint8)0xffffff };
-    window.setIcon(1, 2, P);
-
-    settings.open();
-
-    while (window.isOpen())
-    {
-        EventCheck(window);
-        if (window.hasFocus() && SomethingHasChanged) {
-            window.clear(Color::White);
-            if(ShowGrid)
-                renderer.renderPlain(window.getPosition());
-            renderer.RenderMousePosition(window.getPosition());
-            for (int i = 0; i < (int)fourier.size(); i++) {
-                if(fourier[i].GetFunctionVisibility())
-                    fourier[i].RenderFunction(renderer);
-            }
-            if (currentFourier != -1 && fourier[currentFourier].GetPointsVisibility())
-                fourier[currentFourier].RenderPoints(renderer);
-            settings.Render(renderer);
-            window.display();
-        }
-        else {
-using namespace std;
-            this_thread::sleep_for(30ms);
-using namespace sf;
-        }
-            
-    }
-}
-
 void Engine::EventCheck(RenderWindow& window)
 {
     SomethingHasChanged = false;
@@ -86,10 +34,15 @@ void Engine::EventCheck(RenderWindow& window)
         Values[FourierPoints] = fourier[currentFourier].GetNumberPoints();
     settings.setValues(Values);
     ButtonsActions(settings.EventCheck(MouseWindowPosition(), fouriersOccupied(), PressingButton));
+    if (currentFourier != -1)
+        fourier[currentFourier].setName(settings.selector.getString(currentFourier));
+    //  Blender Events
+    if (blender.EventCheck(MouseWindowPosition(), fourier))
+        change();
 
     // Everything to do with function events
     if (!PressingButton && currentFourier != -1)
-        fourier[currentFourier].FunctionEvents(SomethingHasChanged, MousePosition, Rend->getScale(), Values);
+        fourier[currentFourier].EventCheck(SomethingHasChanged, MousePosition, Rend->getScale(), Values);
 
     while (window.pollEvent(event))
     {
@@ -161,8 +114,10 @@ void Engine::Reset()
 
 void Engine::AddFourier()
 {
-    fourier.push_back(Fourier(ColorWheel(TotalFouriersHad)));
     TotalFouriersHad++;
+    std::string String = "Untitled " + std::to_string(TotalFouriersHad);
+    settings.selector.AddOption(String);
+    fourier.push_back(Fourier(ColorWheel(TotalFouriersHad),String));
     currentFourier = fourier.size() - 1;
     fourier[currentFourier].CreateDataSet(DefaultInitialPoints, InitialRadius);
     Values.clear();
@@ -172,8 +127,6 @@ void Engine::AddFourier()
     PressingButton = false;
     settings.setPointsVisibility(true);
     settings.setFunctionVisibility(true);
-    std::string String = "Untitled " + std::to_string(TotalFouriersHad);
-    settings.selector.AddOption(String);
 }
 
 void Engine::DeleteFourier()
@@ -283,7 +236,7 @@ void Engine::LoadFromFile(std::string filename)
         float* y = (float*)calloc(Values[0], sizeof(float));
         for (int j = 0; j < Values[0]; j++)
             fscanf(file, "%f %f\n", &x[j], &y[j]);
-        fourier.push_back(Fourier(Values, x, y, color));
+        fourier.push_back(Fourier(Values, x, y, Name, color));
         fourier[i].SetPointsVisibility(v0);
         fourier[i].SetFunctionVisibility(v1);
         TotalFouriersHad++;
@@ -399,3 +352,59 @@ void Engine::ButtonsActions(int ButtonPressed)
     if (ButtonPressed >= 30)
         SetFourier(ButtonPressed - 30);
 }
+
+//  Public
+
+Engine::Engine()
+{   
+    Values.push_back(DefaultInitialPoints);
+    Values.push_back(DefaultPointsFunction);
+    Values.push_back(DefaultFourierDepth);
+    fourier.push_back(Fourier(ColorWheel(TotalFouriersHad)));
+    fourier[0].CreateDataSet(Values[FourierPoints]);
+    TotalFouriersHad++;
+}
+
+void Engine::MainLoop()
+{
+    RenderWindow window(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", Style::Default);
+    window.setPosition(InitialWinPos);
+    Renderer renderer(window);
+    Rend = &renderer;
+    window.setFramerateLimit(60);
+
+    //  Posali una icona mes guai
+    Image icon;
+    icon.loadFromFile("Resources/Textures/Icon.png");
+    TransparentGreenScreen(&icon);
+    window.setIcon(51,51, icon.getPixelsPtr());
+
+    settings.open();
+
+    while (window.isOpen())
+    {
+        EventCheck(window);
+        if (window.hasFocus() && SomethingHasChanged) {
+            window.clear(Color::White);
+            if(ShowGrid)
+                renderer.renderPlain(window.getPosition());
+            for (int i = 0; i < (int)fourier.size(); i++) {
+                if(fourier[i].GetFunctionVisibility())
+                    fourier[i].RenderFunction(renderer);
+            }
+            if (currentFourier != -1 && fourier[currentFourier].GetPointsVisibility())
+                fourier[currentFourier].RenderPoints(renderer);
+            settings.Render(renderer);
+            blender.Render(renderer);
+            window.display();
+        }
+
+        else {
+using namespace std;
+            this_thread::sleep_for(30ms);
+using namespace sf;
+        }
+    }
+}
+
+

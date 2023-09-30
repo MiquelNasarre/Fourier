@@ -7,6 +7,15 @@ bool Selector::isOnOption(int N, Vector2i MousePos)
 	return false;
 }
 
+void Selector::SetToPosition()
+{
+	for (int i = 0; i < (int)OptionSprites.size(); i++) {
+		OptionSprites[i].setPosition(Position.x, Position.y + DimMain.y + DimOption.y * i);
+		OptionTexts[i].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * i + 2.f);
+	}
+	Closer.setPosition(Position.x, Position.y + DimMain.y + DimOption.y * OptionTexts.size());
+}
+
 //	Public
 
 Selector::Selector(std::string TextureFile, std::vector<Vector2i> PosInFile, std::vector<Vector2i> SizeInFile, Vector2f position, bool Draw) {
@@ -120,6 +129,11 @@ std::string Selector::getString(int N)
 	return OptionTexts[N].getString();
 }
 
+int Selector::getSize()
+{
+	return OptionTexts.size();
+}
+
 void Selector::ChangeOpen()
 {
 	if (IsOpen == false) {
@@ -132,13 +146,11 @@ void Selector::ChangeOpen()
 	}
 }
 
-void Selector::SetToPosition()
+void Selector::setPosition(Vector2f Pos)
 {
-	for (int i = 0; i < (int)OptionSprites.size(); i++) {
-		OptionSprites[i].setPosition(Position.x, Position.y + DimMain.y + DimOption.y * i);
-		OptionTexts[i].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * i + 2.f);
-	}
-	Closer.setPosition(Position.x, Position.y + DimMain.y + DimOption.y * OptionTexts.size());
+	Position = Pos;
+	Main.setPosition(Position);
+	SetToPosition();
 }
 
 int Selector::EventCheck(Vector2i MousePos) {
@@ -163,14 +175,15 @@ int Selector::EventCheck(Vector2i MousePos) {
 		}
 	}
 	else {
-		if (IsOpen)
-			SetTexture(Main, TexMain[3]);
-		else
-			SetTexture(Main, TexMain[0]);
+		if (IsOpen && SetTexture(Main, TexMain[3]))
+			return -1;
+		else if (!IsOpen && SetTexture(Main, TexMain[0]))
+			return -1;
 	}
 	if (Mouse::isButtonPressed(Mouse::Left))
 		Pressing = true;
 
+	int change = -2;
 	if (IsOpen) {
 		for (int i = 0; i < (int)OptionTexts.size(); i++) {
 			if (isOnOption(i, MousePos)) {
@@ -186,12 +199,11 @@ int Selector::EventCheck(Vector2i MousePos) {
 					return -1;
 				}
 			}
-			else {
-				OptionSprites[i].setTexture(TexOption[0]);
-			}
+			else if(SetTexture(OptionSprites[i],TexOption[0]))
+				change = -1;
 		}
 	}
-	return -2;
+	return change;
 }
 
 void Selector::Render(Renderer& renderer)

@@ -29,10 +29,12 @@ public:
 	Selector(std::string TextureFile, std::vector<Vector2i> PosInFile, std::vector<Vector2i> SizeInFile, Vector2f position = Vector2f(0.f, 0.f), bool Draw = true);
 
 	std::string getString(int N);
+	int getSize();
 
 	void SetVisibility(bool isOpen);
 	void SetCurrentSelected(int N);
 	void ChangeOpen();
+	void setPosition(Vector2f Pos);
 	void IncreasePosition(float dx, float dy);
 	void ChangeName(std::string name);
 	

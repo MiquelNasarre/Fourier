@@ -60,6 +60,7 @@ int NumberBar::EventCheck(Event& event, Vector2i MousePos)
 		if (Mouse::isButtonPressed(Mouse::Left)) {
 			SetTexture(Holder, TexHolder[2]);
 			Pressed = true;
+			JustPressed = true;
 		}
 		else if (!Pressed)
 			SetTexture(Holder, TexHolder[1]);
@@ -73,6 +74,11 @@ int NumberBar::EventCheck(Event& event, Vector2i MousePos)
 			SetTexture(Holder, TexHolder[0]);
 	}
 	if (Pressed && event.type == Event::TextEntered) {
+		if (JustPressed) {
+			setNumber(0);
+			JustPressed = false;
+		}
+			
 		if (event.text.unicode >= 48 && event.text.unicode <= 57 && Number * 10 + (int)event.text.unicode - 48 >= Minimum && Number * 10 + (int)event.text.unicode - 48 <= Maximum) {
 			Number = Number * 10 + (int)event.text.unicode - 48;
 			StrNumber = std::to_string(Number);

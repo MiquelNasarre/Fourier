@@ -38,20 +38,30 @@ void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
 
 void Settings::MouseEvents(int& Change, Vector2i& MouseScPos, bool& PressingButton)
 {
-
 	int tick;
-	for (int i = 0; i < (int)Boxes.size(); i++) {
-		tick = Boxes[i].EventCheck(MouseScPos);
+	if (selector.getSize()) {
+		tick = Boxes[0].EventCheck(MouseScPos);
 		if (tick) {
-			Change = tick + 14 + 2 * i;
+			Change = tick + 14;
+			return;
+		}
+		tick = Boxes[1].EventCheck(MouseScPos);
+		if (tick) {
+			Change = tick + 16;
 			return;
 		}
 	}
+	tick = Boxes[2].EventCheck(MouseScPos);
+	if (tick) {
+		Change = tick + 18;
+		return;
+	}
+	
 
 	for (unsigned int i = 0; i < Buttons.size(); i++) {
 		
 		
-		int State = Buttons[i].ButtonEvents(MouseScPos);
+		int State = Buttons[i].EventCheck(MouseScPos);
 		if (State > 0) {
 			Change = 1;
 		}

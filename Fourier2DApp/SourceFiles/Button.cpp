@@ -103,7 +103,22 @@ void Button::setTexture(int t)
 	State = t + 1;
 }
 
-int Button::ButtonEvents(Vector2i MouseScPos)
+void Button::setTextures(std::vector<Texture> textures)
+{
+	Textures = textures;
+}
+
+void Button::setFont(Font font)
+{
+	textFont = font;
+}
+
+void Button::setString(std::string String)
+{
+	text.setString(String);
+}
+
+int Button::EventCheck(Vector2i MouseScPos)
 {
 	if (InsideRectangle(MouseScPos,Position,(Vector2i)Dimensions)) {
 		if (Mouse::isButtonPressed(Mouse::Left)) {
