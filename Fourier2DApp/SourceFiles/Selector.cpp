@@ -23,10 +23,12 @@ Selector::Selector(std::string TextureFile, std::vector<Vector2i> PosInFile, std
 	Position = position;
 	DimMain = SizeInFile[0];
 	DimOption = SizeInFile[1];
+	CurrentSelection = -1;
 
 	Image image;
 	Texture texture;
 	image.loadFromFile(TextureFile);
+	TransparentGreenScreen(&image);
 	texture.loadFromImage(image, IntRect(PosInFile[0], SizeInFile[0]));
 	TexMain.push_back(texture);
 	texture.loadFromImage(image, IntRect(PosInFile[1], SizeInFile[0]));
@@ -117,11 +119,28 @@ void Selector::SetCurrentSelected(int N)
 	CurrentSelection = N;
 }
 
+void Selector::Open()
+{
+	Main.setTexture(TexMain[5]);
+	IsOpen = true;
+}
+
+void Selector::Close()
+{
+	Main.setTexture(TexMain[2]);
+	IsOpen = false;
+}
+
 void Selector::ChangeName(std::string name)
 {
 	if (!name.size())
 		return;
 	OptionTexts[CurrentSelection].setString(name);
+}
+
+void Selector::WhenToOpen(int n)
+{
+	WhenOpen = n;
 }
 
 std::string Selector::getString(int N)
@@ -134,16 +153,9 @@ int Selector::getSize()
 	return OptionTexts.size();
 }
 
-void Selector::ChangeOpen()
+int Selector::getCurrentSelected()
 {
-	if (IsOpen == false) {
-		Main.setTexture(TexMain[5]);
-		IsOpen = true;
-	}
-	else {
-		Main.setTexture(TexMain[2]);
-		IsOpen = false;
-	}
+	return CurrentSelection;
 }
 
 void Selector::setPosition(Vector2f Pos)
@@ -158,14 +170,18 @@ int Selector::EventCheck(Vector2i MousePos) {
 		return -2;
 	else
 		Pressing = false;
-	if (InsideRectangle(MousePos,Position,DimMain)) {
+	if (InsideRectangle(MousePos, Position, DimMain) && WhenOpen != OpenNever) {
 		if (MousePos.x > Position.x + 91.f &&
 			MousePos.x < Position.x + 105.f &&
 			Mouse::isButtonPressed(Mouse::Left) &&
 			IsOpen == false && CurrentSelection != -1)
 			ChangeName(Popup::InputString());
-		if (MousePos.x > Position.x + 109.f && Mouse::isButtonPressed(Mouse::Left))
-			ChangeOpen();
+		if (MousePos.x > Position.x + 109.f && ((Mouse::isButtonPressed(Mouse::Left) && WhenOpen == OpenWhenPressed) || WhenOpen == OpenWhenHovered)) {
+			if (IsOpen)
+				Close();
+			else
+				Open();
+		}
 		else {
 			if (IsOpen && SetTexture(Main, TexMain[4]))
 				return -1;
@@ -209,7 +225,7 @@ int Selector::EventCheck(Vector2i MousePos) {
 void Selector::Render(Renderer& renderer)
 {
 	renderer.RenderSprite(Main);
-	if (OptionTexts.size()) {
+	if (OptionTexts.size() && CurrentSelection != -1) {
 		OptionTexts[CurrentSelection].setPosition(Position.x + 6.f, Position.y + 4.f);
 		renderer.RenderText(OptionTexts[CurrentSelection]);
 		OptionTexts[CurrentSelection].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * CurrentSelection + 2.f);

@@ -363,6 +363,7 @@ Engine::Engine()
     fourier.push_back(Fourier(ColorWheel(TotalFouriersHad)));
     fourier[0].CreateDataSet(Values[FourierPoints]);
     TotalFouriersHad++;
+    srand(time(nullptr));
 }
 
 void Engine::MainLoop()

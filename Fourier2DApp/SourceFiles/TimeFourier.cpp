@@ -28,7 +28,7 @@ Color TimeFourier::currentColor()
 	unsigned char G = (unsigned char)(FunctionColors[Current0].g * (1 - time) + FunctionColors[Current1].g * time);
 	unsigned char B = (unsigned char)(FunctionColors[Current0].b * (1 - time) + FunctionColors[Current1].b * time);
 	unsigned char A = (unsigned char)(FunctionColors[Current0].a * (1 - time) + FunctionColors[Current1].a * time);
-	return Color(0,0,0,255);
+	return Color(R,G,B,255);
 }
 
 int TimeFourier::getSize()
@@ -59,6 +59,13 @@ void TimeFourier::deleteCoefficients(int n)
 		Current0--;
 	if (Current1 >= n)
 		Current1--;
+}
+
+void TimeFourier::deleteAll()
+{
+	Coefficients.clear();
+	FunctionColors.clear();
+	Change();
 }
 
 void TimeFourier::StopTime()

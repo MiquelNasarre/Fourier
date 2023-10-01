@@ -57,6 +57,9 @@
     <ClCompile Include="SourceFiles\TimeFourier.cpp">
       <Filter>Sources\Private</Filter>
     </ClCompile>
+    <ClCompile Include="SourceFiles\Scroller.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeaderFiles\Fourier.h">
@@ -96,6 +99,9 @@
       <Filter>Sources\Public</Filter>
     </ClInclude>
     <ClInclude Include="HeaderFiles\TimeFourier.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Scroller.h">
       <Filter>Sources\Public</Filter>
     </ClInclude>
   </ItemGroup>

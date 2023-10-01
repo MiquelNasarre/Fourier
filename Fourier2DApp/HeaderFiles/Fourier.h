@@ -39,7 +39,9 @@ private:
 
 public:
 
-	Fourier(Color color = Color::Red, std::string name = "Untitled") : FunctionColor{color}, Name{ name } {}
+	void* RandomPointer;
+
+	Fourier(Color color = Color::Red, std::string name = "Untitled") : FunctionColor{color}, Name{ name } { RandomPointer = (void*)(rand() * rand()); }
 	Fourier(std::vector<int> Values, float* x, float* y, std::string name, Color color = Color::Red);
 
 	void SetDepth(int d);

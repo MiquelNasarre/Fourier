@@ -187,7 +187,7 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
     Image icon;
     icon.loadFromFile("Resources/Textures/TextPopupIcon.png");
     TransparentGreenScreen(&icon);
-    window.setIcon(20, 20, icon.getPixelsPtr());
+    window.setIcon(26, 26, icon.getPixelsPtr());
 
     std::string name;
 

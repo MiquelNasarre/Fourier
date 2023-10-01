@@ -34,3 +34,8 @@ Vector2f IncreaseVector(Vector2f vector, float dx, float dy)
 	return Vector2f(vector.x + dx, vector.y + dy);
 }
 
+Vector2f AddVectors(Vector2f v0, Vector2f v1)
+{
+	return Vector2f(v0.x + v1.x, v0.y + v1.y);
+}
+

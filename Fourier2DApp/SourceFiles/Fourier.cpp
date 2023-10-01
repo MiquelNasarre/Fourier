@@ -7,6 +7,8 @@ Fourier::Fourier(std::vector<int> Values, float* x, float* y, std::string name, 
 	Coefficients.N = Values[2];
 	GenerateS0();
 	GraphFunctionS0(Values[1]);
+
+	RandomPointer = (void*)(rand() * rand());
 }
 
 void Fourier::SetDepth(int d)

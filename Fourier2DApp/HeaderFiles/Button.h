@@ -21,6 +21,13 @@ private:
 	bool					Visibility;
 
 public:
+	static const int Pressed	=  3;
+	static const int Pressing	= -3;
+	static const int Hovered	=  2;
+	static const int Hovering	= -2;
+	static const int Unhovered	=  1;
+	static const int NoState	= -1;
+
 	Button() {}
 	Button(std::string TextureFile, std::vector<Vector2i> PosInFile, Vector2i SizeInFile, Vector2f scale, Vector2f position = Vector2f(0.f, 0.f), bool Draw = true, std::string textStr = "", Vector2f textPosition = Vector2f(0.f, 0.f), Font font = Font(), int characterSize = 14, Color FillColor = Color::Black);
 	Button(const Button& other);

@@ -42,6 +42,8 @@ Button::Button(const Button& other)
 	text = other.text;
 	text.setFont(textFont);
 	text.setPosition(other.text.getPosition());
+	text.setString(other.text.getString());
+	text.setFillColor(other.text.getFillColor());
 }
 
 Vector2f Button::GetPosition()
@@ -99,7 +101,7 @@ void Button::setVisibility(bool V)
 
 void Button::setTexture(int t)
 {
-	sprite.setTexture(Textures[t]);
+	SetTexture(sprite, Textures[t]);
 	State = t + 1;
 }
 
@@ -139,8 +141,13 @@ int Button::EventCheck(Vector2i MouseScPos)
 		}
 	}
 	else {
-		if (State == 1 || State == -1)
-			State = -1;
+		if (State == 1 || State == -1) {
+			if (SetTexture(sprite, Textures[0]))
+				State = 1;
+			else
+				State = -1;
+		}
+			
 		else {
 			State = 1;
 			sprite.setTexture(Textures[0]);

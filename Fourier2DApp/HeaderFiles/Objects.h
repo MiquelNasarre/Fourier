@@ -34,3 +34,5 @@ bool SetTexture(Sprite& sprite, Texture& texture);
 bool InsideRectangle(Vector2i MousePos, Vector2f Position, Vector2i Size);
 
 Vector2f IncreaseVector(Vector2f vector, float dx, float dy);
+
+Vector2f AddVectors(Vector2f v0, Vector2f v1);

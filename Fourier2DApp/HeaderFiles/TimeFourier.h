@@ -29,6 +29,7 @@ public:
 	void setSmoothness(int s);
 	void AddCoefficients(dataset* New, Color color);
 	void deleteCoefficients(int n);
+	void deleteAll();
 	void StopTime();
 	void StartTime();
 	void Restart();

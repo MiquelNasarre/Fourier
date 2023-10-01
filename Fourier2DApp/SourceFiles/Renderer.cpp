@@ -1,5 +1,10 @@
 #include "Renderer.h"
 
+Renderer::Renderer(RenderTarget& target) : m_target{ target }
+{
+    font.loadFromFile(ArialFontFile);
+}
+
 void Renderer::SetWindowPos(Vector2i WinPos)
 {
     WindowPos = WinPos;
@@ -202,6 +207,7 @@ void Renderer::RenderTexts(std::vector<Text> Texts)
 
 void Renderer::RenderText(Text text)
 {
+    text.setFont(font);
     m_target.draw(text);
 }
 

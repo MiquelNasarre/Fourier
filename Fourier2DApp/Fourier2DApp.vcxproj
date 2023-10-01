@@ -168,6 +168,7 @@
     <ClCompile Include="SourceFiles\Objects.cpp" />
     <ClCompile Include="SourceFiles\Popup.cpp" />
     <ClCompile Include="SourceFiles\Renderer.cpp" />
+    <ClCompile Include="SourceFiles\Scroller.cpp" />
     <ClCompile Include="SourceFiles\Selector.cpp" />
     <ClCompile Include="SourceFiles\Settings.cpp" />
     <ClCompile Include="SourceFiles\TickBox.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="HeaderFiles\Objects.h" />
     <ClInclude Include="HeaderFiles\Popup.h" />
     <ClInclude Include="HeaderFiles\Renderer.h" />
+    <ClInclude Include="HeaderFiles\Scroller.h" />
     <ClInclude Include="HeaderFiles\Selector.h" />
     <ClInclude Include="HeaderFiles\Settings.h" />
     <ClInclude Include="HeaderFiles\TickBox.h" />

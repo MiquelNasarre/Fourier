@@ -20,11 +20,10 @@ private:
     float Scale = 200;
     bool OpenSettingsTexture = true;
     Vector2i WindowPos;
-
+    Font font;
 public:
     explicit
-        Renderer(RenderTarget& target) : m_target{ target } {
-    }
+        Renderer(RenderTarget& target);
 
     void SetWindowPos(Vector2i WinPos);
     void renderPlain(Vector2i Pos) const;
