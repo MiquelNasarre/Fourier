@@ -2,21 +2,22 @@
 
 Vector2f Scroller::calculatePos(int n)
 {
-	return Vector2f(Position.x, Position.y + (float)atan(float(n - CurrentSelected) / 1.5) * 50);
+	return Vector2f(Position.x, Position.y + (float)atan(float(n - CurrentSelected) / 1.5) * 40);
 }
+
+//	Public
 
 Scroller::Scroller(Vector2f position)
 	: Position{ position },
-	BigAddButton	{ Button(BigAddButtonInitializer, Position) },
-	AddDown			{ Button(DownButtonInitializer, AddDownPos) },
-	AddUp			{ Button(UpButtonInitializer, AddUpPos)		},
-	Delete			{ Button(UpButtonInitializer, AddUpPos)		},
-	ScrollerSelector{ Selector(InvisibleSelector,Position)		}
+	BigAddButton	{ Button(BigAddButtonInitializer, Position)		},
+	AddDown			{ Button(AdDownButtonInitializer, AddDownPos)	},
+	AddUp			{ Button(AddUpButtonInitializer, AddUpPos)		},
+	Delete			{ Button(CrossButtonInitializer, DeletePos)		},
+	ScrollerSelector{ Selector(InvisibleSelector,Position)			}
 {
 	ScrollerSelector.WhenToOpen(Selector::OpenNever);
 	font.loadFromFile(ArialFontFile);
 }
-
 
 Scroller::Scroller(const Scroller& other)
 	: ScrollerSelector{ other.ScrollerSelector }
@@ -31,34 +32,50 @@ Scroller::Scroller(const Scroller& other)
 	ScrollerPos = other.ScrollerPos;
 	CurrentSelected = other.CurrentSelected;
 	pressing = other.pressing;
+	Tracker = other.Tracker;
 }
 
 void Scroller::setPosition(Vector2f position)
 {
 	Position = position;
 	BigAddButton.setPosition(position);
-	AddDown.setPosition(position);
-	AddUp.setPosition(position);
+	AddDown.setPosition(AddDownPos);
+	AddUp.setPosition(AddUpPos);
+	Delete.setPosition(DeletePos);
 }
 
-
-void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track)
+bool Scroller::TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void*>& track)
 {
+	bool update = false;
 	for (int i = 0; i < (int)Tracker.size(); i++) {
 		if (Tracker[i] && std::find(OptionsPointer.begin(), OptionsPointer.end(), Tracker[i]) == OptionsPointer.end()) {
 			Tracker.erase(Tracker.begin() + i);
 			Selections.erase(Selections.begin() + i);
-			for (int i = 0; i < (int)Selections.size(); i++)
-				Selections[i].setPosition(calculatePos(i));
+			for (int j = 0; j < (int)Selections.size(); j++)
+				Selections[j].setPosition(calculatePos(j));
 			if (CurrentSelected >= i && CurrentSelected)
 				CurrentSelected--;
+			update = true;
 		}
 	}
 	track = Tracker;
+	return update;
+}
+
+void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track)
+{
+	TrackerUpdate(OptionsPointer, track);
+	for (int i = 0; i < (int)Selections.size(); i++) {
+		if (Tracker[i])
+			Selections[i].setString(Options[std::find(OptionsPointer.begin(), OptionsPointer.end(), Tracker[i]) - OptionsPointer.begin()]);
+	}
+		
 	if (!Mouse::isButtonPressed(Mouse::Left))
 		pressing = false;
 	if (pressing)
 		return;
+	if (Mouse::isButtonPressed(Mouse::Left))
+		pressing = true;
 
 	if (ScrollerSelector.IsOpen) {
 		ScrollerSelector.RemoveAll();
@@ -81,28 +98,50 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 		Tracker.push_back(NULL);
 		ScrollerSelector.Open();
 		CurrentSelected = 0;
+		BigAddButton.setState(Button::NoState);
 	}
 	if (Selections.size()) {
 		Selections[CurrentSelected].setTexture(0);
-		if (AddDown.EventCheck(MousePos) == Button::Pressed) {
+
+		int ButtonState = AddDown.EventCheck(MousePos);
+		if (ButtonState == Button::Pressed) {
 			Selections.insert(Selections.begin() + CurrentSelected + 1, Button(TextButtonInitializer, Position, true, "", Vector2f(10.f, 3.f), font, 12));
 			Tracker.insert(Tracker.begin() + CurrentSelected + 1, NULL);
 			CurrentSelected++;
 			ScrollerSelector.Open();
 			for (int i = 0; i < (int)Selections.size(); i++)
 				Selections[i].setPosition(calculatePos(i));
-			pressing = true;
 			return;
 		}
-		if (AddUp.EventCheck(MousePos) == Button::Pressed) {
+		else if (ButtonState == Button::Hovered || ButtonState == Button::Hovering) {
+			if (CurrentSelected < (int)Selections.size() - 1)
+				Selections[CurrentSelected + 1].setTexture(0);
+			return;
+		}
+		ButtonState = AddUp.EventCheck(MousePos);
+		if (ButtonState == Button::Pressed) {
 			Selections.insert(Selections.begin() + CurrentSelected, Button(TextButtonInitializer, Position,true,"",Vector2f(10.f,3.f),font,12));
 			Tracker.insert(Tracker.begin() + CurrentSelected, NULL);
 			ScrollerSelector.Open();
 			for (int i = 0; i < (int)Selections.size(); i++)
 				Selections[i].setPosition(calculatePos(i));
-			pressing = true;
 			return;
 		}
+		else if (ButtonState == Button::Hovered || ButtonState == Button::Hovering) {
+			if (CurrentSelected)
+				Selections[CurrentSelected - 1].setTexture(0);
+			return;
+		}
+
+		if (Delete.EventCheck(MousePos) == Button::Pressed) {
+			Tracker.erase(Tracker.begin() + CurrentSelected);
+			Selections.erase(Selections.begin() + CurrentSelected);
+			for (int i = 0; i < (int)Selections.size(); i++)
+				Selections[i].setPosition(calculatePos(i));
+			if (CurrentSelected)
+				CurrentSelected--;
+		}
+
 		for (int i = CurrentSelected + 1; i < (int)Selections.size(); i++) {
 			int ButtonEvent = Selections[i].EventCheck(MousePos);
 			if (ButtonEvent == Button::Pressed) {
@@ -136,7 +175,6 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 
 		for (int i = 0; i < (int)Selections.size(); i++)
 			Selections[i].setPosition(calculatePos(i));
-			
 	}
 }
 
@@ -156,5 +194,8 @@ void Scroller::Render(Renderer& renderer)
 		AddDown.Render(renderer);
 	}
 	Selections[CurrentSelected].Render(renderer);
-	ScrollerSelector.Render(renderer);
+	if (!ScrollerSelector.IsOpen)
+		Delete.Render(renderer);
+	if(ScrollerSelector.IsOpen)
+		ScrollerSelector.Render(renderer);
 }

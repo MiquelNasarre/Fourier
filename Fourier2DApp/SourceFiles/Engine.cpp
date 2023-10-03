@@ -36,13 +36,21 @@ void Engine::EventCheck(RenderWindow& window)
     ButtonsActions(settings.EventCheck(MouseWindowPosition(), fouriersOccupied(), PressingButton));
     if (currentFourier != -1)
         fourier[currentFourier].setName(settings.selector.getString(currentFourier));
-    //  Blender Events
-    if (blender.EventCheck(MouseWindowPosition(), fourier))
-        change();
-
+    
     // Everything to do with function events
     if (!PressingButton && currentFourier != -1)
         fourier[currentFourier].EventCheck(SomethingHasChanged, MousePosition, Rend->getScale(), Values);
+
+    //  Blender Events
+    if (blender.EventCheck(MouseWindowPosition(), fourier))
+        change();
+    if (currentFourier != -1) {
+        settings.setPointsVisibility(fourier[currentFourier].GetPointsVisibility());
+        settings.setFunctionVisibility(fourier[currentFourier].GetFunctionVisibility());
+    }
+    
+    
+
 
     while (window.pollEvent(event))
     {
@@ -155,13 +163,31 @@ void Engine::DeleteFourier()
 void Engine::DuplicateFourier()
 {
     std::string String = settings.selector.getString(currentFourier);
-    if (String.substr(0, 6) != "(Copy)")
-        String = "(Copy)" + String;
-    while (String.size() > 16)
+    if (String[String.size() - 1] == ')') {
+        std::vector<int> N;
         String.pop_back();
+        while (String[String.size() - 1] != '(') {
+            N.push_back((int)String[String.size() - 1] - 48);
+            if (String.size() == 1 || (int)String[String.size() - 1] - 48 < 0 || (int)String[String.size() - 1] - 48 > 9) {
+                N.clear();
+                String = settings.selector.getString(currentFourier) + "(1)";
+                break;
+            }
+            else
+                String.pop_back();
+        }
+        int n = 0;
+        for (int i = 0; i < (int)N.size(); i++)
+            n += N[i] * (int)pow(10, i);
+        if(n)
+            String = String + std::to_string(n + 1) + ')';
+    }
+    else
+        String = String + "(1)";
     settings.selector.AddOption(String);
     fourier.push_back(fourier[currentFourier]);
     currentFourier = fourier.size() - 1;
+    fourier[currentFourier].ResetRandomPointer();
     
 }
 
@@ -306,6 +332,7 @@ void Engine::ButtonsActions(int ButtonPressed)
             fourier[currentFourier].Draw();
             settings.setPointsVisibility(true);
             settings.close();
+            blender.Close();
         }
         return;
     case(Settings::Delete):
@@ -363,18 +390,18 @@ Engine::Engine()
     fourier.push_back(Fourier(ColorWheel(TotalFouriersHad)));
     fourier[0].CreateDataSet(Values[FourierPoints]);
     TotalFouriersHad++;
-    srand(time(nullptr));
+    srand((unsigned int)time(nullptr));
 }
 
 void Engine::MainLoop()
 {
-    RenderWindow window(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", Style::Default);
+    RenderWindow window(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", sf::Style::Titlebar | sf::Style::Close);
     window.setPosition(InitialWinPos);
     Renderer renderer(window);
     Rend = &renderer;
     window.setFramerateLimit(60);
 
-    //  Posali una icona mes guai
+    //  Icona guai posada :3
     Image icon;
     icon.loadFromFile("Resources/Textures/Icon.png");
     TransparentGreenScreen(&icon);

@@ -40,6 +40,16 @@ void Blender::MoveBlender(float dx, float dy)
 	AddBlenderButton.setPosition(AddBlenderButtonPos);
 	for (int i = 0; i < (int)scrollers.size(); i++)
 		scrollers[i].setPosition(ScrollerBlenderPos);
+	PlayButton.setPosition(PlayButtonPos);
+	StopButton.setPosition(PlayButtonPos);
+	GoBack.setPosition(BackButtonPos);
+	GoForward.setPosition(ForwardButtonPos);
+	Increase.setPosition(IncreaseButtonPos);
+	Decrease.setPosition(DecreaseButtonPos);
+	HideAll.setPosition(HideAllButtonPos);
+	ShowAll.setPosition(ShowAllButtonPos);
+	Reset.setPosition(ResetButtonPos);
+	Delete.setPosition(DeleteButtonPos);
 }
 
 void Blender::NewBlender()
@@ -48,6 +58,8 @@ void Blender::NewBlender()
 	TimeFouriers.push_back(TimeFourier());
 	scrollers.push_back(Scroller(ScrollerBlenderPos));
 	currentBlender = scrollers.size() - 1;
+	TimeFouriers[currentBlender].setSmoothness(500);
+	TimePlaying = false;
 }
 
 //	Public
@@ -55,19 +67,31 @@ void Blender::NewBlender()
 Blender::Blender() 
 	: MenuButton		{ Button(InvisibleButton(34,28),DefaultBlenderPos)  },
 	MainSelector		{ Selector(SelectorInitializer,MainSelectorPos)     },
-	AddBlenderButton	{ Button(PlusButtonInitializer,AddBlenderButtonPos) }
+	AddBlenderButton	{ Button(PlusButtonInitializer,AddBlenderButtonPos) },
+	PlayButton			{ Button(PlayButtonInitializer,PlayButtonPos)		},
+	StopButton			{ Button(StopButtonInitializer,PlayButtonPos)		},
+	GoBack				{ Button(BackButtonInitializer,BackButtonPos)		},		
+	GoForward			{ Button(FrwdButtonInitializer,ForwardButtonPos)	},	
+	Increase			{ Button(NextButtonInitializer,IncreaseButtonPos)	},	
+	Decrease			{ Button(PrevButtonInitializer,DecreaseButtonPos)	},
+	HideAll				{ Button(BigButtonInitializer,HideAllButtonPos, true, "Hide All", Vector2f(13.f, 4.f),Font(),12) },
+	ShowAll				{ Button(BigButtonInitializer,ShowAllButtonPos, true, "Show All", Vector2f(11.f, 4.f),Font(),12) },
+	Reset				{ Button(BigButtonInitializer,ResetButtonPos,   true, "Reset"   , Vector2f(17.f, 4.f),Font(),12) },
+	Delete				{ Button(BigButtonInitializer,DeleteButtonPos,  true, "Delete  ", Vector2f(16.f, 4.f),Font(),12) }
 {
 	OpenMenu = false;
 	MenuPos = DefaultBlenderPos;
 	currentBlender = -1;
+	TimePlaying = false;
+	Pressing = false;
 
 	Image image;
 	image.loadFromFile(TexturesFile);
 	TransparentGreenScreen(&image);
 	Texture texture;
-	texture.loadFromImage(image, IntRect(323, 104, 157, 285));
+	texture.loadFromImage(image, IntRect(323, 104, 157, 321));
 	MenuTextures.push_back(texture);
-	texture.loadFromImage(image, IntRect(480, 104, 157, 285));
+	texture.loadFromImage(image, IntRect(480, 104, 157, 321));
 	MenuTextures.push_back(texture);
 	Menu.setTexture(MenuTextures[0]);
 	Menu.setColor(Color(255, 255, 255, 150));
@@ -87,69 +111,127 @@ void Blender::Close()
 
 int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 {
-
-	if (currentBlender != -1)
-		TimeFouriers[currentBlender].UpdatePlot();
-
-	if (Keyboard::isKeyPressed(Keyboard::I)) {
-		TimeFouriers[currentBlender].Restart();
-		TimeFouriers[currentBlender].StartTime();
-		TimeFouriers[currentBlender].setSmoothness(500);
-		
-	}
-		
-
 	int change = 0;
 	MenuMovements(change, fouriers.size());
+
 	if (fouriers.size() < 2)
 		return change;
 
-	if (MenuButton.EventCheck(MousePos) == 3) {
-		if (OpenMenu)
-			Close();
-		else
-			Open();
+	//	Important Bullshit
+	if (currentBlender != -1) {
+
+		std::vector<std::string> Names;
+		for (int i = 0; i < (int)fouriers.size(); i++)
+			Names.push_back(fouriers[i].getName());
+
+		std::vector<void*> fourierPointers;
+		for (int i = 0; i < (int)fouriers.size(); i++)
+			fourierPointers.push_back(fouriers[i].RandomPointer);
+
+		std::vector<void*> getOrder;
+
+		scrollers[currentBlender].EventCheck(MousePos, Names, fourierPointers, getOrder);
+		if (getOrder.size()) {
+			TimeFouriers[currentBlender].deleteAll();
+			for (int i = 0; i < (int)getOrder.size(); i++) {
+				if (getOrder[i]) {
+					Fourier* F = &fouriers[std::find(fourierPointers.begin(), fourierPointers.end(), getOrder[i]) - fourierPointers.begin()];
+					TimeFouriers[currentBlender].AddCoefficients(F->getCoefficients(), F->GetFunctionColor());
+				}
+			}
+		}
+		for (int i = 0; i < (int)TimeFouriers.size(); i++) {
+			if (i == currentBlender)
+				continue;
+			getOrder.clear();
+			scrollers[i].TrackerUpdate(fourierPointers, getOrder);
+			if (getOrder.size()) {
+				TimeFouriers[i].deleteAll();
+				for (int j = 0; j < (int)getOrder.size(); j++) {
+					if (getOrder[j]) {
+						Fourier* F = &fouriers[std::find(fourierPointers.begin(), fourierPointers.end(), getOrder[j]) - fourierPointers.begin()];
+						TimeFouriers[i].AddCoefficients(F->getCoefficients(), F->GetFunctionColor());
+					}
+				}
+			}
+		}
 	}
-
-	int iAddButton = AddBlenderButton.EventCheck(MousePos);
-	if (iAddButton > 0)
-		change = 1;
-	if (iAddButton == 3)
-		NewBlender();
-
-	if (MainSelector.EventCheck(MousePos) >= -1)
-		change = 1;
 
 	for (int i = 0; i < (int)TimeFouriers.size(); i++) {
 		if (TimeFouriers[i].UpdatePlot())
 			change = 1;
 	}
 
-	std::vector<std::string> Names;
-	for (int i = 0; i < (int)fouriers.size(); i++)
-		Names.push_back(fouriers[i].getName());
-	if (currentBlender != -1) {
+	//	Less Important Bullshit
 
-		std::vector<void*> fourierPointers;
-		for (int i = 0; i < (int)fouriers.size(); i++)
-			fourierPointers.push_back(fouriers[i].RandomPointer);
-		std::vector<void*> getOrder;
-		scrollers[currentBlender].EventCheck(MousePos, Names,fourierPointers, getOrder);
-		if (!getOrder.size())
-			return 1;
-		TimeFouriers[currentBlender].deleteAll();
-		for (int i = 0; i < (int)getOrder.size(); i++) {
-			if (getOrder[i]) {
-				Fourier* F = &fouriers[std::find(fourierPointers.begin(), fourierPointers.end(), getOrder[i]) - fourierPointers.begin()];
-				TimeFouriers[currentBlender].AddCoefficients(F->getCoefficients(), F->GetFunctionColor());
-			}
-		}
-		
+	if (!Mouse::isButtonPressed(Mouse::Left))
+		Pressing = false;
+	if (Pressing)
+		return change;
+	if (Mouse::isButtonPressed(Mouse::Left))
+		Pressing = true;
 
+	if (TimePlaying == false && PlayButton.EventCheck(MousePos) == Button::Pressed && currentBlender != -1 && TimeFouriers[currentBlender].StartTime())
+		TimePlaying = true;
+
+	else if (TimePlaying == true && StopButton.EventCheck(MousePos) == Button::Pressed && currentBlender != -1) {
+		TimePlaying = false;
+		TimeFouriers[currentBlender].StopTime();
 	}
-	
-	change = 1;
 
+	else if (GoBack.EventCheck(MousePos) == Button::Pressed && currentBlender != -1)
+		TimeFouriers[currentBlender].Back();
+
+	else if (GoForward.EventCheck(MousePos) == Button::Pressed && currentBlender != -1)
+		TimeFouriers[currentBlender].Forward();
+
+	else if (Increase.EventCheck(MousePos) == Button::Pressed && currentBlender != -1)
+		TimeFouriers[currentBlender].IncreaseSpeed(0.8f);
+
+	else if (Decrease.EventCheck(MousePos) == Button::Pressed && currentBlender != -1)
+		TimeFouriers[currentBlender].IncreaseSpeed(1.25f);
+
+	else if (HideAll.EventCheck(MousePos) == Button::Pressed) {
+		for (int i = 0; i < (int)fouriers.size(); i++) {
+			fouriers[i].SetPointsVisibility(false);
+			fouriers[i].SetFunctionVisibility(false);
+		}
+	}
+
+	else if (ShowAll.EventCheck(MousePos) == Button::Pressed) {
+		for (int i = 0; i < (int)fouriers.size(); i++) {
+			fouriers[i].SetPointsVisibility(true);
+			fouriers[i].SetFunctionVisibility(true);
+		}
+	}
+
+	else if (Reset.EventCheck(MousePos) == Button::Pressed && currentBlender != -1)
+		TimeFouriers[currentBlender].Restart();
+
+	else if (Delete.EventCheck(MousePos) == Button::Pressed && currentBlender != -1) {
+		TimeFouriers.erase(TimeFouriers.begin() + currentBlender);
+		scrollers.erase(scrollers.begin() + currentBlender);
+		MainSelector.RemoveOption();
+		currentBlender--;
+		return 1;
+	}
+
+	else if (MenuButton.EventCheck(MousePos) == Button::Pressed) {
+		if (OpenMenu)
+			Close();
+		else
+			Open();
+	}
+
+	else if (AddBlenderButton.EventCheck(MousePos) == Button::Pressed) {
+		NewBlender();
+	}
+
+	else if (MainSelector.EventCheck(MousePos) >= -1) {
+		currentBlender = MainSelector.getCurrentSelected();
+	}
+
+	change = 1;
 	return change;
 }
 
@@ -160,10 +242,26 @@ void Blender::Render(Renderer& renderer)
 		TimeFouriers[i].Render(renderer);
 	if (!OpenMenu)
 		return;
-	MainSelector.Render(renderer);
+	if (TimePlaying)
+		StopButton.Render(renderer);
+	else
+		PlayButton.Render(renderer);
+
+	GoBack.Render(renderer);
+	GoForward.Render(renderer);
 	AddBlenderButton.Render(renderer);
-	for (int i = 0; i < (int)scrollers.size(); i++)
-		scrollers[i].Render(renderer);
+	Increase.Render(renderer);
+	Decrease.Render(renderer);
+	HideAll.Render(renderer);
+	ShowAll.Render(renderer);
+	Reset.Render(renderer);
+	Delete.Render(renderer);
+
+
+	if (currentBlender != -1)
+		scrollers[currentBlender].Render(renderer);
+	
+	MainSelector.Render(renderer);
 }
 
 void Blender::Render(RenderWindow& window)

@@ -41,6 +41,7 @@ public:
 	void setPosition(float x, float y);
 	void IncreasePosition(Vector2f Diff);
 	void IncreasePosition(float dx, float dy);
+	void setState(int s);
 	void setVisibility(bool V);
 	void setTexture(int t);
 

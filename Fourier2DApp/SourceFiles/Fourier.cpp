@@ -60,6 +60,11 @@ void Fourier::setName(std::string name)
 	Name = name;
 }
 
+void Fourier::ResetRandomPointer()
+{
+	RandomPointer = (void*)(rand() * rand());
+}
+
 dataset* Fourier::getCoefficients()
 {
 	return &Coefficients;

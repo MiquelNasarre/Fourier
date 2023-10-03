@@ -210,4 +210,3 @@ void Renderer::RenderText(Text text)
     text.setFont(font);
     m_target.draw(text);
 }
-

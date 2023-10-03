@@ -52,6 +52,7 @@ public:
 	void SetPointsVisibility(bool T);
 	void SetFunctionVisibility(bool T);
 	void setName(std::string name);
+	void ResetRandomPointer();
 
 	dataset* getCoefficients();
 	Color GetFunctionColor();

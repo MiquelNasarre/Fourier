@@ -15,7 +15,7 @@ private:
 	bool Playing = false;
 	bool changes = true;
 	PixelFunction CurrentPlot;
-	int Current0, Current1;
+	int Current0 = 0, Current1 = 1;
 
 	float EvalX(float theta);
 	float EvalY(float theta);
@@ -31,9 +31,12 @@ public:
 	void deleteCoefficients(int n);
 	void deleteAll();
 	void StopTime();
-	void StartTime();
+	bool StartTime();
 	void Restart();
 	void Change();
+	void Back();
+	void Forward();
+	void IncreaseSpeed(float x);
 
 	bool UpdatePlot();
 	void Render(Renderer& renderer);

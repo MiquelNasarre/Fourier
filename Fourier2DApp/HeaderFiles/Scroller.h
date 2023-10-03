@@ -8,6 +8,7 @@
 
 #define AddDownPos		IncreaseVector(Position,43.f,22.f)
 #define AddUpPos		IncreaseVector(Position,43.f,-10.f)
+#define DeletePos		IncreaseVector(Position,107.f,6.f)
 
 class Scroller {
 private:
@@ -35,6 +36,7 @@ public:
 
 	void setPosition(Vector2f position);
 
+	bool TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void*>& track);
 	void EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track);
 	void Render(Renderer& renderer);
 };

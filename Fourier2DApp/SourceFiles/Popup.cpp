@@ -1,5 +1,4 @@
 #include "Popup.h"
-#include "Renderer.h"
 
 Image Popup::createColorPalete(Vector2i size)
 {

@@ -94,6 +94,17 @@ void Button::IncreasePosition(float dx, float dy)
 	text.setPosition(Position.x + textPos.x, Position.y + textPos.y);
 }
 
+void Button::setState(int s)
+{
+	State = s;
+	if (s == 1 || s == -1)
+		SetTexture(sprite, Textures[0]);
+	if (s == 2 || s == -2)
+		SetTexture(sprite, Textures[1]);
+	if (s == 3 || s == -3)
+		SetTexture(sprite, Textures[2]);
+}
+
 void Button::setVisibility(bool V)
 {
 	Visibility = V;

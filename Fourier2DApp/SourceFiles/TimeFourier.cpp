@@ -73,12 +73,13 @@ void TimeFourier::StopTime()
 	Playing = false;
 }
 
-void TimeFourier::StartTime()
+bool TimeFourier::StartTime()
 {
 	if (Coefficients.size() < 2)
-		return;
+		return false;
 	Playing = true;
 	itime = (float)clock();
+	return true;
 }
 
 void TimeFourier::Restart()
@@ -87,6 +88,7 @@ void TimeFourier::Restart()
 	itime = (float)clock();
 	Current0 = 0;
 	Current1 = 1;
+	speed = 1;
 	Change();
 }
 
@@ -95,18 +97,44 @@ void TimeFourier::Change()
 	changes = true;
 }
 
+void TimeFourier::Back()
+{
+	itime = (float)clock();
+	if (time < 0.1) {
+		Current0 = (Current0 - 1 + Coefficients.size()) % Coefficients.size();
+		Current1 = (Current0 + 1) % Coefficients.size();
+	}
+	else
+		time = 0;
+}
+
+void TimeFourier::Forward()
+{
+	itime = (float)clock() - CLOCKS_PER_SEC;
+	time = 1;
+}
+
+void TimeFourier::IncreaseSpeed(float x)
+{
+	speed = x * speed;
+}
+
 bool TimeFourier::UpdatePlot()
 {
 	if ((!Playing && !changes) || Coefficients.size() < 2)
 		return false;
-	time = ((float)clock() - itime) * speed / CLOCKS_PER_SEC;
-	while (time > 1) {
+	if(Playing)
+		time += ((float)clock() - itime) * speed / CLOCKS_PER_SEC;
+	itime = (float)clock();
+	while (time >= 1) {
 		Current0 = (Current0 + 1) % Coefficients.size();
-		Current1 = (Current1 + 1) % Coefficients.size();
+		Current1 = (Current0 + 1) % Coefficients.size();
 		time--;
-		itime += CLOCKS_PER_SEC;
 	}
-
+	if (Current0 >= (int)Coefficients.size() || Current1 >= (int)Coefficients.size()) {
+		Current0 = Current0 % Coefficients.size();
+		Current1 = (Current0 + 1) % Coefficients.size();
+	}
 	Color col = currentColor();
 	for (int i = 0; i < CurrentPlot.N; i++) {
 		CurrentPlot.x[i] = EvalX(2 * i * (float)Pi / (CurrentPlot.N - 1));

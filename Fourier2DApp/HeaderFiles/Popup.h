@@ -3,6 +3,7 @@
 #include "Header.h"
 #include "Button.h"
 #include "NumberBar.h"
+#include "Renderer.h"
 
 #define MaxNameSize 14
 
