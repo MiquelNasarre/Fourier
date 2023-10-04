@@ -116,6 +116,12 @@ void Button::setTexture(int t)
 	State = t + 1;
 }
 
+void Button::setColor(Color color)
+{
+	if (sprite.getColor() != color)
+		sprite.setColor(color);
+}
+
 void Button::setTextures(std::vector<Texture> textures)
 {
 	Textures = textures;

@@ -49,8 +49,9 @@ void Engine::EventCheck(RenderWindow& window)
         settings.setFunctionVisibility(fourier[currentFourier].GetFunctionVisibility());
     }
     
-    
-
+    //  ToolBox Events
+    if (toolBox.EventCheck(MouseWindowPosition(), fourier))
+        change();
 
     while (window.pollEvent(event))
     {
@@ -426,6 +427,7 @@ void Engine::MainLoop()
                 fourier[currentFourier].RenderPoints(renderer);
             settings.Render(renderer);
             blender.Render(renderer);
+            toolBox.Render(renderer);
             window.display();
         }
 

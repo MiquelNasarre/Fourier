@@ -6,7 +6,7 @@
 #include "Objects.h"
 
 #define DefaultTextPos		Vector2f(4.f, 2.f)
-#define DefaultOptionPos(x) Vector2f(0.f, DimOption.y * x)
+#define DefaultOptionPos(x) Vector2f(0.f, (float)DimOption.y * x)
 
 class Selector {
 public:

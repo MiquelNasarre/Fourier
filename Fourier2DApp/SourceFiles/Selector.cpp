@@ -3,7 +3,7 @@
 bool Selector::isOnOption(int N, Vector2i MousePos)
 {
 	if (InsideRectangle(MousePos, Vector2f(Position.x, Position.y + DimMain.y + DimOption.y * (N - SlidePos)), DimOption) && 
-		InsideRectangle(MousePos, Vector2f(Position.x, Position.y + DimMain.y), Vector2i(DimOption.x, DimOption.y * MaxLength)))
+		InsideRectangle(MousePos, Vector2f(Position.x, Position.y + DimMain.y), Vector2i(DimOption.x, int(DimOption.y * MaxLength))))
 		return true;
 	return false;
 }
@@ -15,9 +15,9 @@ void Selector::SetToPosition()
 		OptionTexts[i].setPosition(AddVectors(DefaultOptionPos(i), DefaultTextPos));
 	}
 	if ((float)OptionTexts.size() < MaxLength)
-		Closer.setPosition(IncreaseVector(AddVectors(DefaultOptionPos(OptionTexts.size()), Position), 0, DimMain.y));
+		Closer.setPosition(IncreaseVector(AddVectors(DefaultOptionPos(OptionTexts.size()), Position), 0, (float)DimMain.y));
 	else
-		Closer.setPosition(IncreaseVector(AddVectors(DefaultOptionPos(MaxLength), Position),0,DimMain.y));
+		Closer.setPosition(IncreaseVector(AddVectors(DefaultOptionPos(MaxLength), Position),0, (float)DimMain.y));
 }
 
 //	Public
@@ -284,7 +284,7 @@ void Selector::Render(Renderer& renderer)
 	sprite.setTexture(texture.getTexture());
 	sprite.setPosition(Position.x, Position.y + DimMain.y);
 	if ((int)OptionTexts.size() > MaxLength)
-		sprite.setTextureRect(IntRect(0, SlidePos * DimOption.y, DimOption.x, MaxLength * DimOption.y));
+		sprite.setTextureRect(IntRect(0, int(SlidePos * DimOption.y), DimOption.x, int(MaxLength * DimOption.y)));
 	renderer.RenderSprite(sprite);
 	renderer.RenderSprite(Closer);
 }

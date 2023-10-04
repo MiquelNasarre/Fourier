@@ -7,6 +7,7 @@
 #include "Settings.h"
 #include "Popup.h"
 #include "Blender.h"
+#include "ToolBox.h"
 
 #define StdKeyCooldown 8
 #define StdButtonCooldown 4
@@ -26,6 +27,7 @@ private:
 	std::vector<Fourier> fourier;
 	Settings settings;
 	Blender blender;
+	ToolBox toolBox;
 
 	Vector2f SettingsPosition = DefaultSettingsPosition;
 	Vector2i WindowPosition = Vector2i(0, 0);
