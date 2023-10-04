@@ -39,3 +39,13 @@ Vector2f AddVectors(Vector2f v0, Vector2f v1)
 	return Vector2f(v0.x + v1.x, v0.y + v1.y);
 }
 
+Vector2i AddVectors(Vector2i v0, Vector2i v1)
+{
+	return Vector2i(v0.x + v1.x, v0.y + v1.y);
+}
+
+Vector2i AddVectors(Vector2i v0, Vector2i v1, Vector2i v2)
+{
+	return Vector2i(v0.x + v1.x + v2.x, v0.y + v1.y + v2.y);
+}
+

@@ -6,8 +6,8 @@
 #include "Objects.h"
 #include "Renderer.h"
 
-#define AddDownPos		IncreaseVector(Position,43.f,22.f)
-#define AddUpPos		IncreaseVector(Position,43.f,-10.f)
+#define AddDownPos		IncreaseVector(Position,41.f,22.f)
+#define AddUpPos		IncreaseVector(Position,41.f,-10.f)
 #define DeletePos		IncreaseVector(Position,107.f,6.f)
 
 class Scroller {
@@ -21,7 +21,7 @@ private:
 	std::vector<Button> Selections;
 	float				ScrollerPos;
 	int					CurrentSelected = -1;
-	bool				pressing;
+	bool				pressing = false;
 	Selector			ScrollerSelector;
 
 	std::vector<void*>	Tracker;
@@ -35,8 +35,11 @@ public:
 	Scroller(const Scroller& other);
 
 	void setPosition(Vector2f position);
+	void pushBack(std::string Name, void* ID);
+
+	std::vector<void*> getTracker();
 
 	bool TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void*>& track);
-	void EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track);
+	int EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track);
 	void Render(Renderer& renderer);
 };

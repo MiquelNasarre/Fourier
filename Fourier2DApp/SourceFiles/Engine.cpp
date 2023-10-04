@@ -124,7 +124,7 @@ void Engine::AddFourier()
 {
     TotalFouriersHad++;
     std::string String = "Untitled " + std::to_string(TotalFouriersHad);
-    settings.selector.AddOption(String);
+    settings.selector.pushBack(String);
     fourier.push_back(Fourier(ColorWheel(TotalFouriersHad),String));
     currentFourier = fourier.size() - 1;
     fourier[currentFourier].CreateDataSet(DefaultInitialPoints, InitialRadius);
@@ -141,7 +141,7 @@ void Engine::DeleteFourier()
 {
     if (currentFourier == -1)
         return;
-    settings.selector.RemoveOption();
+    settings.selector.erase();
     fourier.erase(fourier.begin() + currentFourier);
     if (fourier.size()) {
         if (currentFourier)
@@ -184,7 +184,7 @@ void Engine::DuplicateFourier()
     }
     else
         String = String + "(1)";
-    settings.selector.AddOption(String);
+    settings.selector.pushBack(String);
     fourier.push_back(fourier[currentFourier]);
     currentFourier = fourier.size() - 1;
     fourier[currentFourier].ResetRandomPointer();
@@ -237,7 +237,7 @@ void Engine::LoadFromFile(std::string filename)
     if (!file)
         return;
     fourier.clear();
-    settings.selector.RemoveAll();
+    settings.selector.clear();
     int N = 0;
     std::string Name;
     fscanf(file, "Number of functions: %i %i\n", &N, &currentFourier);
@@ -266,11 +266,12 @@ void Engine::LoadFromFile(std::string filename)
         fourier[i].SetPointsVisibility(v0);
         fourier[i].SetFunctionVisibility(v1);
         TotalFouriersHad++;
-        settings.selector.AddOption(Name);
+        settings.selector.pushBack(Name);
     }
+    blender.LoadFile(file, fourier);
     fclose(file);
     SetFourier(currentFourier);
-    settings.selector.SetCurrentSelected(currentFourier);
+    settings.selector.setCurrentSelected(currentFourier);
     return;
 }
 
@@ -289,6 +290,7 @@ void Engine::SaveToFile(std::string filename)
         for (int j = 0; j < iValues[0]; j++)
             fprintf(file, "%.4f %.4f\n", fourier[i].getPosition(j).x, fourier[i].getPosition(j).y);
     }
+    blender.SaveFive(file, fourier);
     fclose(file);
 }
 

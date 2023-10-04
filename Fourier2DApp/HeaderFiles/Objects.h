@@ -36,3 +36,7 @@ bool InsideRectangle(Vector2i MousePos, Vector2f Position, Vector2i Size);
 Vector2f IncreaseVector(Vector2f vector, float dx, float dy);
 
 Vector2f AddVectors(Vector2f v0, Vector2f v1);
+
+Vector2i AddVectors(Vector2i v0, Vector2i v1);
+
+Vector2i AddVectors(Vector2i v0, Vector2i v1, Vector2i v2);

@@ -6,7 +6,7 @@ void Blender::MenuMovements(int& change, int fourier)
 		Close();
 		Menu.setColor(Color(255, 255, 255, 150));
 		scrollers.clear();
-		MainSelector.RemoveAll();
+		MainSelector.clear();
 		TimeFouriers.clear();
 		currentBlender = -1;
 		change = 1;
@@ -53,8 +53,11 @@ void Blender::MoveBlender(float dx, float dy)
 }
 
 void Blender::NewBlender()
-{
-	MainSelector.AddOption(Popup::InputString());
+{	
+	std::string Name = Popup::InputString();
+	if (!Name.size())
+		return;
+	MainSelector.pushBack(Name);
 	TimeFouriers.push_back(TimeFourier());
 	scrollers.push_back(Scroller(ScrollerBlenderPos));
 	currentBlender = scrollers.size() - 1;
@@ -116,8 +119,10 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 
 	if (fouriers.size() < 2)
 		return change;
-
+	if (!Mouse::isButtonPressed(Mouse::Left))
+		Pressing = false;
 	//	Important Bullshit
+
 	if (currentBlender != -1) {
 
 		std::vector<std::string> Names;
@@ -130,7 +135,24 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 
 		std::vector<void*> getOrder;
 
-		scrollers[currentBlender].EventCheck(MousePos, Names, fourierPointers, getOrder);
+		int scrollerEvents = scrollers[currentBlender].EventCheck(MousePos, Names, fourierPointers, getOrder);
+		if (scrollerEvents) {
+			Pressing = true;
+			change = 1;
+			PlayButton.setTexture(0);
+			StopButton.setTexture(0);
+			GoBack.setTexture(0);
+			GoForward.setTexture(0);
+			Increase.setTexture(0);
+			Decrease.setTexture(0);
+			HideAll.setTexture(0);
+			ShowAll.setTexture(0);
+			Reset.setTexture(0);
+			Delete.setTexture(0);
+		}
+		if (scrollerEvents > 1 && !TimePlaying)
+			TimeFouriers[currentBlender].setCurrent(scrollerEvents - 2);
+			
 		if (getOrder.size()) {
 			TimeFouriers[currentBlender].deleteAll();
 			for (int i = 0; i < (int)getOrder.size(); i++) {
@@ -164,14 +186,18 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 
 	//	Less Important Bullshit
 
-	if (!Mouse::isButtonPressed(Mouse::Left))
-		Pressing = false;
+	
 	if (Pressing)
 		return change;
 	if (Mouse::isButtonPressed(Mouse::Left))
 		Pressing = true;
 
-	if (TimePlaying == false && PlayButton.EventCheck(MousePos) == Button::Pressed && currentBlender != -1 && TimeFouriers[currentBlender].StartTime())
+	if (MainSelector.EventCheck(MousePos) >= -1) {
+		currentBlender = MainSelector.getCurrentSelected();
+		if (currentBlender != -1)
+			TimePlaying = TimeFouriers[currentBlender].isPlaying();
+	}
+	else if (TimePlaying == false && PlayButton.EventCheck(MousePos) == Button::Pressed && currentBlender != -1 && TimeFouriers[currentBlender].StartTime())
 		TimePlaying = true;
 
 	else if (TimePlaying == true && StopButton.EventCheck(MousePos) == Button::Pressed && currentBlender != -1) {
@@ -211,8 +237,12 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 	else if (Delete.EventCheck(MousePos) == Button::Pressed && currentBlender != -1) {
 		TimeFouriers.erase(TimeFouriers.begin() + currentBlender);
 		scrollers.erase(scrollers.begin() + currentBlender);
-		MainSelector.RemoveOption();
+		MainSelector.erase();
 		currentBlender--;
+		if (currentBlender == -1 && scrollers.size())
+			currentBlender++;
+		if (currentBlender == -1)
+			TimePlaying = false;
 		return 1;
 	}
 
@@ -225,10 +255,6 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 
 	else if (AddBlenderButton.EventCheck(MousePos) == Button::Pressed) {
 		NewBlender();
-	}
-
-	else if (MainSelector.EventCheck(MousePos) >= -1) {
-		currentBlender = MainSelector.getCurrentSelected();
 	}
 
 	change = 1;
@@ -271,4 +297,59 @@ void Blender::Render(RenderWindow& window)
 		return;
 	MainSelector.Render(window);
 	AddBlenderButton.Render(window);
+}
+
+void Blender::SaveFive(FILE* file, std::vector<Fourier>& fouriers)
+{
+	fprintf(file, "Number of blenders: %u %i\n", TimeFouriers.size(), currentBlender);
+
+	std::vector<void*> fourierPointers;
+	for (int i = 0; i < (int)fouriers.size(); i++)
+		fourierPointers.push_back(fouriers[i].RandomPointer);
+
+	for (int i = 0; i < (int)TimeFouriers.size(); i++) {
+		fprintf(file, "%s\nNumber of fouriers: %i\n", MainSelector.getString(i).c_str(), TimeFouriers[i].getSize());
+		std::vector<void*> tracker = scrollers[i].getTracker();
+		for (int j = 0; j < (int)tracker.size(); j++)
+			fprintf(file, "%i ", std::find(fourierPointers.begin(), fourierPointers.end(), tracker[j]) - fourierPointers.begin());
+		fprintf(file, "\nSpeed: %f\n", TimeFouriers[i].getSpeed());
+	}
+}
+
+void Blender::LoadFile(FILE* file, std::vector<Fourier>& fouriers)
+{
+	scrollers.clear();
+	TimeFouriers.clear();
+	MainSelector.clear();
+	TimePlaying = false;
+
+	int n, current;
+	fscanf(file, "Number of blenders: %u %i\n", &n, &current);
+	
+	std::string Name;
+	for (int i = 0; i < n; i++) {
+		Name.clear();
+		char c = 'P';
+		Name.clear();
+		fscanf(file, "%c", &c);
+		while (c != L'\n') {
+			Name.push_back(c);
+			fscanf(file, "%c", &c);
+		}
+		MainSelector.pushBack(Name);
+		TimeFouriers.push_back(TimeFourier());
+		scrollers.push_back(Scroller(ScrollerBlenderPos));
+		TimeFouriers[i].setSmoothness(500);
+
+		int n, x;
+		fscanf(file, "Number of fouriers: %i\n", &n);
+		for (int j = 0; j < n; j++) {
+			fscanf(file, "%i ", &x);
+			TimeFouriers[i].AddCoefficients(fouriers[x].getCoefficients(), fouriers[x].GetFunctionColor());
+			scrollers[i].pushBack(fouriers[x].getName(), fouriers[x].RandomPointer);
+		}
+		float s;
+		fscanf(file, "\nSpeed: %f\n", &s);
+		TimeFouriers[i].setSpeed(s);
+	}
 }

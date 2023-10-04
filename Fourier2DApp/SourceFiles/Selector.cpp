@@ -2,7 +2,8 @@
 
 bool Selector::isOnOption(int N, Vector2i MousePos)
 {
-	if (MousePos.x > Position.x && MousePos.x <= Position.x + DimOption.x && MousePos.y > Position.y + DimMain.y + DimOption.y * N && MousePos.y <= Position.y + DimMain.y + DimOption.y * (N + 1))
+	if (InsideRectangle(MousePos, Vector2f(Position.x, Position.y + DimMain.y + DimOption.y * (N - SlidePos)), DimOption) && 
+		InsideRectangle(MousePos, Vector2f(Position.x, Position.y + DimMain.y), Vector2i(DimOption.x, DimOption.y * MaxLength)))
 		return true;
 	return false;
 }
@@ -10,10 +11,13 @@ bool Selector::isOnOption(int N, Vector2i MousePos)
 void Selector::SetToPosition()
 {
 	for (int i = 0; i < (int)OptionSprites.size(); i++) {
-		OptionSprites[i].setPosition(Position.x, Position.y + DimMain.y + DimOption.y * i);
-		OptionTexts[i].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * i + 2.f);
+		OptionSprites[i].setPosition(DefaultOptionPos(i));
+		OptionTexts[i].setPosition(AddVectors(DefaultOptionPos(i), DefaultTextPos));
 	}
-	Closer.setPosition(Position.x, Position.y + DimMain.y + DimOption.y * OptionTexts.size());
+	if ((float)OptionTexts.size() < MaxLength)
+		Closer.setPosition(IncreaseVector(AddVectors(DefaultOptionPos(OptionTexts.size()), Position), 0, DimMain.y));
+	else
+		Closer.setPosition(IncreaseVector(AddVectors(DefaultOptionPos(MaxLength), Position),0,DimMain.y));
 }
 
 //	Public
@@ -55,6 +59,29 @@ Selector::Selector(std::string TextureFile, std::vector<Vector2i> PosInFile, std
 	font.loadFromFile("Resources/Fonts/arial.ttf");
 }
 
+Selector::Selector(const Selector& other)
+{
+	Position = other.Position;
+	DimMain = other.DimMain;
+	DimOption = other.DimOption;
+	font = other.font;
+
+	OptionTexts = other.OptionTexts;
+	TexMain = other.TexMain;
+	TexOption = other.TexOption;
+	TexCloser = other.TexCloser;
+
+	Main = other.Main;
+	Closer = other.Closer;
+	Closer.setTexture(TexCloser[0]);
+	OptionSprites = other.OptionSprites;
+
+	Pressing = false;
+	ToBe = other.ToBe;
+	CurrentSelection = other.CurrentSelection;
+	WhenOpen = other.WhenOpen;
+}
+
 void Selector::IncreasePosition(float dx, float dy)
 {
 	Position = Vector2f(Position.x + dx, Position.y + dy);
@@ -62,12 +89,12 @@ void Selector::IncreasePosition(float dx, float dy)
 	SetToPosition();
 }
 
-void Selector::SetVisibility(bool isOpen)
+void Selector::setVisibility(bool isOpen)
 {
 	ToBe = isOpen;
 }
 
-void Selector::AddOption(Text text)
+void Selector::pushBack(Text text)
 {
 	OptionTexts.push_back(text);
 	OptionSprites.push_back(Sprite(TexOption[0]));
@@ -75,7 +102,7 @@ void Selector::AddOption(Text text)
 	SetToPosition();
 }
 
-void Selector::AddOption(std::string String)
+void Selector::pushBack(std::string String)
 {
 	Text text;
 	text.setString(String);
@@ -88,14 +115,14 @@ void Selector::AddOption(std::string String)
 	SetToPosition();
 }
 
-void Selector::RemoveAll()
+void Selector::clear()
 {
 	CurrentSelection = -1;
 	OptionTexts.clear();
 	OptionSprites.clear();
 }
 
-void Selector::RemoveOption()
+void Selector::erase()
 {
 	OptionTexts.erase(OptionTexts.begin() + CurrentSelection);
 	OptionSprites.erase(OptionSprites.begin() + CurrentSelection);
@@ -105,7 +132,7 @@ void Selector::RemoveOption()
 	SetToPosition();
 }
 
-void Selector::RemoveOption(int N)
+void Selector::erase(int N)
 {
 	OptionTexts.erase(OptionTexts.begin() + N);
 	CurrentSelection--;
@@ -114,7 +141,7 @@ void Selector::RemoveOption(int N)
 	SetToPosition();
 }
 
-void Selector::SetCurrentSelected(int N)
+void Selector::setCurrentSelected(int N)
 {
 	CurrentSelection = N;
 }
@@ -131,7 +158,7 @@ void Selector::Close()
 	IsOpen = false;
 }
 
-void Selector::ChangeName(std::string name)
+void Selector::setName(std::string name)
 {
 	if (!name.size())
 		return;
@@ -175,7 +202,7 @@ int Selector::EventCheck(Vector2i MousePos) {
 			MousePos.x < Position.x + 105.f &&
 			Mouse::isButtonPressed(Mouse::Left) &&
 			IsOpen == false && CurrentSelection != -1)
-			ChangeName(Popup::InputString());
+			setName(Popup::InputString());
 		if (MousePos.x > Position.x + 109.f && ((Mouse::isButtonPressed(Mouse::Left) && WhenOpen == OpenWhenPressed) || WhenOpen == OpenWhenHovered)) {
 			if (IsOpen)
 				Close();
@@ -201,6 +228,18 @@ int Selector::EventCheck(Vector2i MousePos) {
 
 	int change = -2;
 	if (IsOpen) {
+
+		if ((int)OptionTexts.size() > MaxLength) {
+			if ((Keyboard::isKeyPressed(Keyboard::Down)) && SlidePos < OptionTexts.size() - MaxLength)
+				SlidePos += 0.2f;
+			if (Keyboard::isKeyPressed(Keyboard::Up) && SlidePos > 0)
+				SlidePos -= 0.2f;
+			if (SlidePos > OptionTexts.size() - MaxLength)
+				SlidePos = OptionTexts.size() - MaxLength;
+		}
+		else
+			SlidePos = 0.f;
+
 		for (int i = 0; i < (int)OptionTexts.size(); i++) {
 			if (isOnOption(i, MousePos)) {
 				if (Mouse::isButtonPressed(Mouse::Left)) {
@@ -228,29 +267,29 @@ void Selector::Render(Renderer& renderer)
 	if (OptionTexts.size() && CurrentSelection != -1) {
 		OptionTexts[CurrentSelection].setPosition(Position.x + 6.f, Position.y + 4.f);
 		renderer.RenderText(OptionTexts[CurrentSelection]);
-		OptionTexts[CurrentSelection].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * CurrentSelection + 2.f);
+		OptionTexts[CurrentSelection].setPosition(AddVectors(DefaultOptionPos(CurrentSelection), DefaultTextPos));
 	}
-	if (!IsOpen)
+	if (!IsOpen || !OptionTexts.size())
 		return;
-	for (int i = 0; i < (int)OptionTexts.size(); i++)
-		renderer.RenderSprite(OptionSprites[i]);
-	renderer.RenderTexts(OptionTexts);
+
+	RenderTexture texture;
+	texture.create(DimOption.x, DimOption.y * OptionTexts.size());
+	texture.clear(Color::Transparent);
+	for (int i = 0; i < (int)OptionTexts.size(); i++) {
+		texture.draw(OptionSprites[i]);
+		texture.draw(OptionTexts[i]);
+	}
+	texture.display();
+	Sprite sprite;
+	sprite.setTexture(texture.getTexture());
+	sprite.setPosition(Position.x, Position.y + DimMain.y);
+	if ((int)OptionTexts.size() > MaxLength)
+		sprite.setTextureRect(IntRect(0, SlidePos * DimOption.y, DimOption.x, MaxLength * DimOption.y));
+	renderer.RenderSprite(sprite);
 	renderer.RenderSprite(Closer);
 }
 
 void Selector::Render(RenderWindow& window)
 {
-	window.draw(Main);
-	if (OptionTexts.size()) {
-		OptionTexts[CurrentSelection].setPosition(Position.x + 6.f, Position.y + 4.f);
-		window.draw(OptionTexts[CurrentSelection]);
-		OptionTexts[CurrentSelection].setPosition(Position.x + 4.f, Position.y + DimMain.y + DimOption.y * CurrentSelection + 2.f);
-	}
-	if (!IsOpen)
-		return;
-	for (int i = 0; i < (int)OptionTexts.size(); i++) {
-		window.draw(OptionSprites[i]);
-		window.draw(OptionTexts[i]);
-	}
-	window.draw(Closer);
+	
 }

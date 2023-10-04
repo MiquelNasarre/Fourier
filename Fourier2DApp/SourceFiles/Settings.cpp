@@ -65,7 +65,7 @@ void Settings::MouseEvents(int& Change, Vector2i& MouseScPos, bool& PressingButt
 		if (State > 0) {
 			Change = 1;
 		}
-		if (State == 3 || State == -3) {
+		if (State == Button::Pressed || State == Button::Pressing) {
 			if (!buttonCooldown) {
 				PressingButton = true;
 				buttonCooldown = DefaultButtonCooldown;
@@ -128,7 +128,7 @@ Settings::Settings() : selector{ Selector(SelectorInitializer, Vector2f(3.f - 12
 	Boxes.push_back(TickBox("Resources/Textures/CustomButtons.png", Vector2i(363, 430), Vector2i(388, 430), Vector2i(16, 16), Vector2f(10, 210), true, true));
 	Boxes.push_back(TickBox("Resources/Textures/CustomButtons.png", Vector2i(363, 430), Vector2i(388, 430), Vector2i(16, 16), Vector2f(10, 238), true, true));
 
-	selector.AddOption("Untitled 1");
+	selector.pushBack("Untitled 1");
 
 	IsOpen = false;
 

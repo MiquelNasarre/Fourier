@@ -193,9 +193,9 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
     while (window.isOpen()) {
         window.setActive();
         window.requestFocus();
-        if (Cancel.EventCheck(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) ==3)
+        if (Cancel.EventCheck(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) == Button::Pressed)
             return "";
-        if (Enter.EventCheck(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) == 3)
+        if (Enter.EventCheck(Vector2i(Mouse::getPosition().x - window.getPosition().x + Ex, Mouse::getPosition().y - window.getPosition().y - Ey)) == Button::Pressed && name.size())
             return name;
 
         Event event;

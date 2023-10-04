@@ -44,6 +44,19 @@ void Scroller::setPosition(Vector2f position)
 	Delete.setPosition(DeletePos);
 }
 
+void Scroller::pushBack(std::string Name, void* ID)
+{
+	Selections.push_back(Button(TextButtonInitializer, Position, true, Name, Vector2f(10.f, 3.f), font, 12));
+	Tracker.push_back(ID);
+	if (CurrentSelected == -1)
+		CurrentSelected++;
+}
+
+std::vector<void*> Scroller::getTracker()
+{
+	return Tracker;
+}
+
 bool Scroller::TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void*>& track)
 {
 	bool update = false;
@@ -62,7 +75,7 @@ bool Scroller::TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void
 	return update;
 }
 
-void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track)
+int Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track)
 {
 	TrackerUpdate(OptionsPointer, track);
 	for (int i = 0; i < (int)Selections.size(); i++) {
@@ -73,24 +86,26 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 	if (!Mouse::isButtonPressed(Mouse::Left))
 		pressing = false;
 	if (pressing)
-		return;
+		return 0;
 	if (Mouse::isButtonPressed(Mouse::Left))
 		pressing = true;
 
 	if (ScrollerSelector.IsOpen) {
-		ScrollerSelector.RemoveAll();
+		ScrollerSelector.clear();
 		for (int i = 0; i < (int)Options.size(); i++)
-			ScrollerSelector.AddOption(Options[i]);
-		ScrollerSelector.SetCurrentSelected(-1);
+			ScrollerSelector.pushBack(Options[i]);
+		ScrollerSelector.setCurrentSelected(-1);
 		int selectorEvent = ScrollerSelector.EventCheck(MousePos);
 		if (selectorEvent >= 0) {
 			pressing = true;
 			Selections[CurrentSelected].setString(ScrollerSelector.getString(ScrollerSelector.getCurrentSelected()));
 			Tracker[CurrentSelected] = OptionsPointer[selectorEvent];
-			ScrollerSelector.RemoveAll();
+			ScrollerSelector.clear();
 			track = Tracker;
 		}
-		return;
+		if (selectorEvent >= -1)
+			return 1;
+		return 0;
 	}
 
 	if (!Selections.size() && BigAddButton.EventCheck(MousePos) == Button::Pressed) {
@@ -111,12 +126,12 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 			ScrollerSelector.Open();
 			for (int i = 0; i < (int)Selections.size(); i++)
 				Selections[i].setPosition(calculatePos(i));
-			return;
+			return 1;
 		}
 		else if (ButtonState == Button::Hovered || ButtonState == Button::Hovering) {
 			if (CurrentSelected < (int)Selections.size() - 1)
 				Selections[CurrentSelected + 1].setTexture(0);
-			return;
+			return 1;
 		}
 		ButtonState = AddUp.EventCheck(MousePos);
 		if (ButtonState == Button::Pressed) {
@@ -125,12 +140,12 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 			ScrollerSelector.Open();
 			for (int i = 0; i < (int)Selections.size(); i++)
 				Selections[i].setPosition(calculatePos(i));
-			return;
+			return 1;
 		}
 		else if (ButtonState == Button::Hovered || ButtonState == Button::Hovering) {
 			if (CurrentSelected)
 				Selections[CurrentSelected - 1].setTexture(0);
-			return;
+			return 1;
 		}
 
 		if (Delete.EventCheck(MousePos) == Button::Pressed) {
@@ -147,7 +162,7 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 			if (ButtonEvent == Button::Pressed) {
 				CurrentSelected = i;
 				pressing = true;
-				break;
+				return i + 2;
 			}
 			if (ButtonEvent == Button::Hovering || ButtonEvent == Button::Hovered) {
 				for (int j = 0; j < (int)Selections.size(); j++)
@@ -162,7 +177,7 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 			if (ButtonEvent == Button::Pressed) {
 				CurrentSelected = i;
 				pressing = true;
-				break;
+				return i + 2;
 			}
 			if (ButtonEvent == Button::Hovering || ButtonEvent == Button::Hovered) {
 				for (int j = 0; j < (int)Selections.size(); j++)
@@ -176,6 +191,7 @@ void Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, s
 		for (int i = 0; i < (int)Selections.size(); i++)
 			Selections[i].setPosition(calculatePos(i));
 	}
+	return 0;
 }
 
 void Scroller::Render(Renderer& renderer)

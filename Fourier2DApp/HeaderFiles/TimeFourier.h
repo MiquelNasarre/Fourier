@@ -25,7 +25,11 @@ private:
 public:
 
 	int getSize();
+	float getSpeed();
+	bool isPlaying();
 
+	void setCurrent(int n);
+	void setSpeed(float s);
 	void setSmoothness(int s);
 	void AddCoefficients(dataset* New, Color color);
 	void deleteCoefficients(int n);

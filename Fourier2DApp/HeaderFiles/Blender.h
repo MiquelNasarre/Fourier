@@ -48,7 +48,6 @@ private:
 	Button					Increase;
 	Button					Decrease;
 
-
 	Button					HideAll;
 	Button					ShowAll;
 	Button					Reset;
@@ -66,6 +65,9 @@ public:
 
 	void Open();
 	void Close();
+
+	void SaveFive(FILE* file, std::vector<Fourier>& fouriers);
+	void LoadFile(FILE* file, std::vector<Fourier>& fouriers);
 
 	int EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers);
 

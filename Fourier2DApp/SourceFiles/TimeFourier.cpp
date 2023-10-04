@@ -36,6 +36,27 @@ int TimeFourier::getSize()
 	return Coefficients.size();
 }
 
+float TimeFourier::getSpeed()
+{
+	return speed;
+}
+
+bool TimeFourier::isPlaying()
+{
+	return Playing;
+}
+
+void TimeFourier::setCurrent(int n)
+{
+	Current0 = n % Coefficients.size();
+	Current1 = (Current0 + 1) % Coefficients.size();
+}
+
+void TimeFourier::setSpeed(float s)
+{
+	speed = s;
+}
+
 void TimeFourier::setSmoothness(int s)
 {
 	CurrentPlot.N = s;
