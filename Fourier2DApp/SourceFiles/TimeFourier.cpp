@@ -50,6 +50,7 @@ void TimeFourier::setCurrent(int n)
 {
 	Current0 = n % Coefficients.size();
 	Current1 = (Current0 + 1) % Coefficients.size();
+	time = 0;
 }
 
 void TimeFourier::setSpeed(float s)

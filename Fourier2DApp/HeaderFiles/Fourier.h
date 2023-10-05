@@ -59,6 +59,7 @@ public:
 	int GetNumberPoints();
 	std::string getName();
 	std::vector<int> GetValues();
+	std::vector<Point>* GetPoints();
 	bool GetPointsVisibility();
 	bool GetFunctionVisibility();
 	bool IsOccupied();

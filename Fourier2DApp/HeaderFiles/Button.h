@@ -23,6 +23,11 @@
 #define ToolsButtonInitializer	TexturesFile, std::vector{ Vector2i(671,115),Vector2i(671,147),Vector2i(671,179) }, Vector2i(32, 26), Vector2f(1.f, 1.f)
 #define ColorButtonInitializer	TexturesFile, std::vector{ Vector2i(285,430),Vector2i(309,430),Vector2i(333,430) }, Vector2i(22, 22), Vector2f(1.f, 1.f)
 #define PlusButtonInitializer	TexturesFile, std::vector{ Vector2i(559,444),Vector2i(559,471),Vector2i(559,498) }, Vector2i(20, 20), Vector2f(1.f, 1.f)
+#define UpperButtonInitializer	TexturesFile, std::vector{ Vector2i(699,241),Vector2i(783,241),Vector2i(867,241) }, Vector2i(30, 26), Vector2f(1.f, 1.f)
+#define DownerButtonInitializer	TexturesFile, std::vector{ Vector2i(699,297),Vector2i(783,297),Vector2i(867,297) }, Vector2i(30, 26), Vector2f(1.f, 1.f)
+#define LeftButtonInitializer	TexturesFile, std::vector{ Vector2i(673,267),Vector2i(757,267),Vector2i(841,267) }, Vector2i(26, 30), Vector2f(1.f, 1.f)
+#define RightButtonInitializer	TexturesFile, std::vector{ Vector2i(729,267),Vector2i(813,267),Vector2i(897,267) }, Vector2i(26, 30), Vector2f(1.f, 1.f)
+#define CenterButtonInitializer	TexturesFile, std::vector{ Vector2i(699,267),Vector2i(783,267),Vector2i(867,267) }, Vector2i(30, 30), Vector2f(1.f, 1.f)
 
 #define InvisibleButton(x,y)	TexturesFile, std::vector{Vector2i(0,0),Vector2i(0,0),Vector2i(0,0)},Vector2i(x,y),Vector2f(1.f,1.f)
 

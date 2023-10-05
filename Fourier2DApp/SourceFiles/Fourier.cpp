@@ -90,6 +90,11 @@ std::vector<int> Fourier::GetValues()
 	return std::vector<int>({(int)Points.size(),F.N,Coefficients.N});
 }
 
+std::vector<Point>* Fourier::GetPoints()
+{
+	return &Points;
+}
+
 bool Fourier::GetPointsVisibility()
 {
 	return PointsVisibility;

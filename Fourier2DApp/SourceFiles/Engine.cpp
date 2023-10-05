@@ -29,6 +29,10 @@ void Engine::EventCheck(RenderWindow& window)
     WindowMovement(window.getPosition());
     Vector2f MousePosition = Renderer::R2Pos((Vector2f)Mouse::getPosition(), WindowPosition, Rend->getScale());
     
+    //  ToolBox Events
+    if (currentFourier != -1 && toolBox.EventCheck(MouseWindowPosition(), fourier[currentFourier]))
+        change();
+
     // Everrything to do with settings events
     if (currentFourier!=-1 && fourier[currentFourier].IsDrawing())
         Values[FourierPoints] = fourier[currentFourier].GetNumberPoints();
@@ -48,10 +52,6 @@ void Engine::EventCheck(RenderWindow& window)
         settings.setPointsVisibility(fourier[currentFourier].GetPointsVisibility());
         settings.setFunctionVisibility(fourier[currentFourier].GetFunctionVisibility());
     }
-    
-    //  ToolBox Events
-    if (toolBox.EventCheck(MouseWindowPosition(), fourier))
-        change();
 
     while (window.pollEvent(event))
     {
