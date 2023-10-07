@@ -31,8 +31,8 @@ private:
 	unsigned char buttonCooldown;
 	bool Freeze = false;
 
-	void MovementEvents(int& Change, Vector2f &SidebarPos);
-	void MouseEvents(int& Change, Vector2i& MouseScPos, bool& PressingButton);
+	void MovementEvents(int& Change);
+	void MouseEvents(int& Change, Vector2i& MousePos, bool& PressingButton);
 
 public:
 	Selector selector;
@@ -65,6 +65,6 @@ public:
 	void close();
 	void open();
 
-	int EventCheck(Vector2i MouseScPos, bool Occupied, bool& PressingButton);
+	int EventCheck(Vector2i MousePos, bool Occupied, bool& PressingButton);
 	void Render(Renderer& renderer);
 };

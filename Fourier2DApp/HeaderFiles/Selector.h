@@ -47,6 +47,7 @@ public:
 	void setVisibility(bool isOpen);
 	void setCurrentSelected(int N);
 	void setName(std::string name);
+	void setName(int N, std::string name);
 	void setPosition(Vector2f Pos);
 	void IncreasePosition(float dx, float dy);
 
@@ -56,6 +57,7 @@ public:
 	
 	void pushBack(Text text);
 	void pushBack(std::string String);
+	void insert(int n, std::string Name);
 	void clear();
 	void erase();
 	void erase(int N);

@@ -115,6 +115,19 @@ void Selector::pushBack(std::string String)
 	SetToPosition();
 }
 
+void Selector::insert(int n, std::string Name)
+{
+	Text text;
+	text.setString(Name);
+	text.setFont(font);
+	text.setFillColor(Color(0, 0, 0, 255));
+	text.setCharacterSize(12);
+	OptionTexts.insert(OptionTexts.begin() + n, text);
+	OptionSprites.insert(OptionSprites.begin() + n, Sprite(TexOption[0]));
+	CurrentSelection = n;
+	SetToPosition();
+}
+
 void Selector::clear()
 {
 	CurrentSelection = -1;
@@ -135,6 +148,7 @@ void Selector::erase()
 void Selector::erase(int N)
 {
 	OptionTexts.erase(OptionTexts.begin() + N);
+	OptionSprites.erase(OptionSprites.begin() + N);
 	CurrentSelection--;
 	if (CurrentSelection == -1 && OptionTexts.size())
 		CurrentSelection++;
@@ -163,6 +177,13 @@ void Selector::setName(std::string name)
 	if (!name.size())
 		return;
 	OptionTexts[CurrentSelection].setString(name);
+}
+
+void Selector::setName(int N, std::string name) 
+{
+	if (!name.size())
+		return;
+	OptionTexts[N].setString(name);
 }
 
 void Selector::WhenToOpen(int n)

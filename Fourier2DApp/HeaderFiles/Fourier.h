@@ -41,7 +41,7 @@ public:
 
 	void* RandomPointer;
 
-	Fourier(Color color = Color::Red, std::string name = "Untitled") : FunctionColor{color}, Name{ name } { RandomPointer = (void*)(rand() * rand()); }
+	Fourier(Color color = Color::Red, std::string name = "Untitled") : FunctionColor{ color }, Name{ name } { RandomPointer = (void*)(rand() * rand()); F.N = 500; }
 	Fourier(std::vector<int> Values, float* x, float* y, std::string name, Color color = Color::Red);
 
 	void SetDepth(int d);
@@ -76,7 +76,7 @@ public:
 	void RenderPoints(Renderer& renderer);
 	Vector2f getPosition(int P);
 
-	void EventCheck(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values);
+	void EventCheck(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values, bool& saves);
 	int CheckCollision(Vector2f MouseR2, float Scale);
 	void Draw();
 };

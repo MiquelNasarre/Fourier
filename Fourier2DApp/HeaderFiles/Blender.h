@@ -66,6 +66,9 @@ public:
 	void Open();
 	void Close();
 
+	void getBlenders(SaveState& save, std::vector<Fourier>& fouriers);
+	void setBlenders(SaveState& save, std::vector<Fourier>& fouriers);
+
 	void SaveFive(FILE* file, std::vector<Fourier>& fouriers);
 	void LoadFile(FILE* file, std::vector<Fourier>& fouriers);
 

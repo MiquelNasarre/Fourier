@@ -18,21 +18,20 @@ class Renderer
 private:
     RenderTarget& m_target;
     float Scale = 200;
-    bool OpenSettingsTexture = true;
     Vector2i WindowPos;
     Font font;
+
 public:
-    explicit
-        Renderer(RenderTarget& target);
+    Renderer(RenderTarget& target);
 
     void SetWindowPos(Vector2i WinPos);
     void renderPlain(Vector2i Pos) const;
     void ModifyScale(float increment);
     float getScale();
-    static Vector2f R2Pos(Vector2f Pos, Vector2i ScreenPos, float scale);
+
+    static Vector2f R2Pos(Vector2i Pos, Vector2i ScreenPos, float scale);
     static Vector2f R2Pos(Vector2f Pos, float Radius, float scale);
     static Vector2f ScPos(Vector2f Pos, float Radius, float scale);
-    static Vector2f ScPos(Vector2f Pos, Vector2f Dimensions, float scale);
 
     void RenderMousePosition(Vector2i Pos) const;
     void RenderGrid() const;
@@ -41,6 +40,5 @@ public:
     void RenderFunction(PixelFunction& Function) const;
     void RenderCircleDescription(Point P, int n) const;
     void RenderSprite(Sprite& sprite) const;
-    void RenderTexts(std::vector<Text> Texts);
     void RenderText(Text text);
 };

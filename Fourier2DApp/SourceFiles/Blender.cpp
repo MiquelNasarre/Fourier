@@ -121,10 +121,10 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 		return change;
 	if (!Mouse::isButtonPressed(Mouse::Left))
 		Pressing = false;
+
 	//	Important Bullshit
 
 	if (currentBlender != -1) {
-
 		std::vector<std::string> Names;
 		for (int i = 0; i < (int)fouriers.size(); i++)
 			Names.push_back(fouriers[i].getName());
@@ -133,9 +133,7 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 		for (int i = 0; i < (int)fouriers.size(); i++)
 			fourierPointers.push_back(fouriers[i].RandomPointer);
 
-		std::vector<void*> getOrder;
-
-		int scrollerEvents = scrollers[currentBlender].EventCheck(MousePos, Names, fourierPointers, getOrder);
+		int scrollerEvents = scrollers[currentBlender].EventCheck(MousePos, Names, fourierPointers);
 		if (scrollerEvents) {
 			Pressing = true;
 			change = 1;
@@ -152,28 +150,17 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 		}
 		if (scrollerEvents > 1 && !TimePlaying)
 			TimeFouriers[currentBlender].setCurrent(scrollerEvents - 2);
-			
-		if (getOrder.size()) {
-			TimeFouriers[currentBlender].deleteAll();
-			for (int i = 0; i < (int)getOrder.size(); i++) {
-				if (getOrder[i]) {
-					Fourier* F = &fouriers[std::find(fourierPointers.begin(), fourierPointers.end(), getOrder[i]) - fourierPointers.begin()];
-					TimeFouriers[currentBlender].AddCoefficients(F->getCoefficients(), F->GetFunctionColor());
-				}
-			}
-		}
+
+		std::vector<void*> getOrder;
 		for (int i = 0; i < (int)TimeFouriers.size(); i++) {
-			if (i == currentBlender)
-				continue;
-			getOrder.clear();
-			scrollers[i].TrackerUpdate(fourierPointers, getOrder);
-			if (getOrder.size()) {
-				TimeFouriers[i].deleteAll();
-				for (int j = 0; j < (int)getOrder.size(); j++) {
-					if (getOrder[j]) {
-						Fourier* F = &fouriers[std::find(fourierPointers.begin(), fourierPointers.end(), getOrder[j]) - fourierPointers.begin()];
-						TimeFouriers[i].AddCoefficients(F->getCoefficients(), F->GetFunctionColor());
-					}
+			if (i != currentBlender)
+				scrollers[i].TrackerUpdate(fourierPointers);
+			getOrder = scrollers[i].getTracker();
+			TimeFouriers[i].deleteAll();
+			for (int j = 0; j < (int)getOrder.size(); j++) {
+				if (getOrder[j]) {
+					Fourier* F = &fouriers[std::find(fourierPointers.begin(), fourierPointers.end(), getOrder[j]) - fourierPointers.begin()];
+					TimeFouriers[i].AddCoefficients(F->getCoefficients(), F->GetFunctionColor());
 				}
 			}
 		}
@@ -191,6 +178,15 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 		return change;
 	if (Mouse::isButtonPressed(Mouse::Left))
 		Pressing = true;
+	
+	if (MenuButton.EventCheck(MousePos) == Button::Pressed) {
+		if (OpenMenu)
+			Close();
+		else
+			Open();
+	}
+	if (!OpenMenu)
+		return change;
 
 	if (MainSelector.EventCheck(MousePos) >= -1) {
 		currentBlender = MainSelector.getCurrentSelected();
@@ -245,18 +241,9 @@ int Blender::EventCheck(Vector2i MousePos, std::vector<Fourier>& fouriers)
 			TimePlaying = false;
 		return 1;
 	}
-
-	else if (MenuButton.EventCheck(MousePos) == Button::Pressed) {
-		if (OpenMenu)
-			Close();
-		else
-			Open();
-	}
-
-	else if (AddBlenderButton.EventCheck(MousePos) == Button::Pressed) {
+	else if (AddBlenderButton.EventCheck(MousePos) == Button::Pressed)
 		NewBlender();
-	}
-
+	
 	change = 1;
 	return change;
 }
@@ -297,6 +284,55 @@ void Blender::Render(RenderWindow& window)
 		return;
 	MainSelector.Render(window);
 	AddBlenderButton.Render(window);
+}
+
+void Blender::getBlenders(SaveState& save, std::vector<Fourier>& fouriers)
+{
+	std::vector<void*> fourierPointers;
+	for (int i = 0; i < (int)fouriers.size(); i++)
+		fourierPointers.push_back(fouriers[i].RandomPointer);
+
+	for (int i = 0; i < (int)scrollers.size(); i++) {
+		save.Blenders.push_back(BlenderSave());
+		save.Blenders[i].Name = MainSelector.getString(i);
+		save.Blenders[i].speed = TimeFouriers[i].getSpeed();
+		std::vector<void*> tracker = scrollers[i].getTracker();
+		for (int j = 0; j < (int)tracker.size(); j++)
+			save.Blenders[i].Order.push_back(std::find(fourierPointers.begin(), fourierPointers.end(), tracker[j]) - fourierPointers.begin());
+	}
+}
+
+void Blender::setBlenders(SaveState& save, std::vector<Fourier>& fouriers)
+{
+	while (save.Blenders.size() < scrollers.size()) {
+		TimeFouriers.erase(TimeFouriers.end() - 1);
+		scrollers.erase(scrollers.end() - 1);
+		MainSelector.erase(MainSelector.getSize() - 1);
+		currentBlender--;
+		if (currentBlender == -1 && scrollers.size())
+			currentBlender++;
+		if (currentBlender == -1)
+			TimePlaying = false;
+	}
+
+	for (int i = 0; i < (int)save.Blenders.size(); i++) {
+		if (scrollers.size() == i) {
+			MainSelector.pushBack(save.Blenders[i].Name);
+			TimeFouriers.push_back(TimeFourier());
+			scrollers.push_back(Scroller(ScrollerBlenderPos));
+			TimeFouriers[scrollers.size() - 1].setSmoothness(500);
+		}
+		else
+			MainSelector.setName(i, save.Blenders[i].Name);
+		scrollers[i].clear();
+		TimeFouriers[i].deleteAll();
+		for (int j = 0; j < (int)save.Blenders[i].Order.size(); j++) {
+			scrollers[i].pushBack(fouriers[save.Blenders[i].Order[j]].getName(), fouriers[save.Blenders[i].Order[j]].RandomPointer);
+			TimeFouriers[i].AddCoefficients(fouriers[save.Blenders[i].Order[j]].getCoefficients(), fouriers[save.Blenders[i].Order[j]].GetFunctionColor());
+		}
+	}
+	if (currentBlender == -1 && scrollers.size())
+		currentBlender++;
 }
 
 void Blender::SaveFive(FILE* file, std::vector<Fourier>& fouriers)

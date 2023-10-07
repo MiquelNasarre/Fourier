@@ -36,10 +36,11 @@ public:
 
 	void setPosition(Vector2f position);
 	void pushBack(std::string Name, void* ID);
+	void clear();
 
 	std::vector<void*> getTracker();
 
-	bool TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void*>& track);
-	int EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track);
+	bool TrackerUpdate(std::vector<void*> OptionsPointer);
+	int EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer);
 	void Render(Renderer& renderer);
 };

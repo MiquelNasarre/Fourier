@@ -1,5 +1,14 @@
 #include "Objects.h"
 
+SaveState::SaveState(int nature, int identifier, std::vector<Point> points, Color color, std::vector<int> values, std::string name)
+	:Location{ FourierLocated }, Nature{ nature }, Identifier{ identifier }, FourierColor{ color }, Values{ values }, Name{ name }
+{
+	for (int i = 0; i < (int)points.size(); i++)
+		Fourier.push_back(points[i].Position);
+}
+
+//	Functions
+
 void TransparentGreenScreen(Image* image)
 {
 	for (unsigned int i = 0; i < image->getSize().x; i++) {
@@ -48,4 +57,3 @@ Vector2i AddVectors(Vector2i v0, Vector2i v1, Vector2i v2)
 {
 	return Vector2i(v0.x + v1.x + v2.x, v0.y + v1.y + v2.y);
 }
-

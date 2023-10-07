@@ -52,12 +52,18 @@ void Scroller::pushBack(std::string Name, void* ID)
 		CurrentSelected++;
 }
 
+void Scroller::clear()
+{
+	Tracker.clear();
+	Selections.clear();
+}
+
 std::vector<void*> Scroller::getTracker()
 {
 	return Tracker;
 }
 
-bool Scroller::TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void*>& track)
+bool Scroller::TrackerUpdate(std::vector<void*> OptionsPointer)
 {
 	bool update = false;
 	for (int i = 0; i < (int)Tracker.size(); i++) {
@@ -71,13 +77,12 @@ bool Scroller::TrackerUpdate(std::vector<void*> OptionsPointer, std::vector<void
 			update = true;
 		}
 	}
-	track = Tracker;
 	return update;
 }
 
-int Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer, std::vector<void*>& track)
+int Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, std::vector<void*> OptionsPointer)
 {
-	TrackerUpdate(OptionsPointer, track);
+	TrackerUpdate(OptionsPointer);
 	for (int i = 0; i < (int)Selections.size(); i++) {
 		if (Tracker[i])
 			Selections[i].setString(Options[std::find(OptionsPointer.begin(), OptionsPointer.end(), Tracker[i]) - OptionsPointer.begin()]);
@@ -101,7 +106,6 @@ int Scroller::EventCheck(Vector2i MousePos, std::vector<std::string> Options, st
 			Selections[CurrentSelected].setString(ScrollerSelector.getString(ScrollerSelector.getCurrentSelected()));
 			Tracker[CurrentSelected] = OptionsPointer[selectorEvent];
 			ScrollerSelector.clear();
-			track = Tracker;
 		}
 		if (selectorEvent >= -1)
 			return 1;

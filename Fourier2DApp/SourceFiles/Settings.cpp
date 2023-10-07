@@ -2,8 +2,9 @@
 
 //	Private
 
-void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
+void Settings::MovementEvents(int& Change)
 {
+	Vector2f SidebarPos = Sidebar.getPosition();
 	if (IsOpen) {
 		if (SetTexture(Sidebar,Textures[OpenedTexture]))
 			Change = true;
@@ -36,41 +37,35 @@ void Settings::MovementEvents(int& Change, Vector2f &SidebarPos)
 	}
 }
 
-void Settings::MouseEvents(int& Change, Vector2i& MouseScPos, bool& PressingButton)
+void Settings::MouseEvents(int& Change, Vector2i& MousePos, bool& PressingButton)
 {
 	int tick;
 	if (selector.getSize()) {
-		tick = Boxes[0].EventCheck(MouseScPos);
+		tick = Boxes[0].EventCheck(MousePos);
 		if (tick) {
 			Change = tick + 14;
 			return;
 		}
-		tick = Boxes[1].EventCheck(MouseScPos);
+		tick = Boxes[1].EventCheck(MousePos);
 		if (tick) {
 			Change = tick + 16;
 			return;
 		}
 	}
-	tick = Boxes[2].EventCheck(MouseScPos);
+	tick = Boxes[2].EventCheck(MousePos);
 	if (tick) {
 		Change = tick + 18;
 		return;
 	}
 	
-
-	for (unsigned int i = 0; i < Buttons.size(); i++) {
-		
-		
-		int State = Buttons[i].EventCheck(MouseScPos);
-		if (State > 0) {
+	for (int i = 0; i < (int)Buttons.size(); i++) {
+		int State = Buttons[i].EventCheck(MousePos);
+		if (State > 0)
 			Change = 1;
-		}
-		if (State == Button::Pressed || State == Button::Pressing) {
-			if (!buttonCooldown) {
+		if ((State == Button::Pressed || State == Button::Pressing) && !buttonCooldown) {
 				PressingButton = true;
 				buttonCooldown = DefaultButtonCooldown;
 				Change = i + 2;
-			}
 		}
 	}
 }
@@ -130,7 +125,7 @@ Settings::Settings() : selector{ Selector(SelectorInitializer, Vector2f(3.f - 12
 
 	selector.pushBack("Untitled 1");
 
-	IsOpen = false;
+	IsOpen = true;
 
 }
 
@@ -185,16 +180,15 @@ void Settings::open()
 	IsOpen = true;
 }
 
-int Settings::EventCheck(Vector2i MouseScPos, bool Occupied, bool& PressingButton)
+int Settings::EventCheck(Vector2i MousePos, bool Occupied, bool& PressingButton)
 {
 	if (Freeze && Mouse::isButtonPressed(Mouse::Left))
 		return 0;
 	else
 		Freeze = false;
 	int Change = false;
-	Vector2f SidebarPos = Sidebar.getPosition();
-	MovementEvents(Change, SidebarPos);
-	int SelectorChange = selector.EventCheck(MouseScPos);
+	MovementEvents(Change);
+	int SelectorChange = selector.EventCheck(MousePos);
 	if (SelectorChange >= -1) {
 		if (SelectorChange > -1)
 			Freeze = true;
@@ -203,12 +197,12 @@ int Settings::EventCheck(Vector2i MouseScPos, bool Occupied, bool& PressingButto
 		return SelectorChange + 30;
 	}
 	if (!Occupied && IsOpen)
-		MouseEvents(Change, MouseScPos, PressingButton);
+		MouseEvents(Change, MousePos, PressingButton);
 
 	if (Mouse::isButtonPressed(Mouse::Left) && !Occupied) {
 		if (buttonCooldown)
 			buttonCooldown--;
-		if (InsideRectangle(MouseScPos, IncreaseVector((Vector2f)Sidebar.getPosition(),120.f,0.f),Vector2i(37,28)) && !buttonCooldown) {
+		if (InsideRectangle(MousePos, IncreaseVector((Vector2f)Sidebar.getPosition(),120.f,0.f),Vector2i(37,28)) && !buttonCooldown) {
 			buttonCooldown = DefaultButtonCooldown;
 			PressingButton = true;
 			Change = 1;
@@ -231,10 +225,14 @@ void Settings::Render(Renderer& renderer)
 	if (IsOpen) {
 		for (int i = 0; i < (int)Buttons.size(); i++)
 			Buttons[i].Render(renderer);
-		renderer.RenderTexts(Texts);
-		selector.Render(renderer);
+
+		for (int i = 0; i < (int)Texts.size(); i++)
+			renderer.RenderText(Texts[i]);
+
 		for (int i = 0; i < (int)Boxes.size(); i++)
 			Boxes[i].Render(renderer);
+
+		selector.Render(renderer);
 	}
 	return;
 }

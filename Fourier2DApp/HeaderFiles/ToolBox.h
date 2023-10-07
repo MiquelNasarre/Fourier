@@ -51,6 +51,7 @@ public:
 	static void		ExpHortFourier(Fourier& fourier, float k);
 	static void		ExpVertFourier(Fourier& fourier, float k);
 
-	bool EventCheck(Vector2i MousePos, Fourier& fourier);
+	bool Close();
+	bool EventCheck(Vector2i MousePos, Fourier& fourier, bool& saves, int number);
 	void Render(Renderer& renderer);
 };

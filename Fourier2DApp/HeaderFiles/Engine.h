@@ -18,44 +18,55 @@
 
 class Engine {
 private:
+	RenderWindow window;
+	Renderer renderer;
+
+	std::vector<SaveState> saveStates;
+
+	Settings settings;
+	Blender blender;
+	ToolBox toolBox;
+	
+	std::vector<Fourier> fourier;
+
 	std::vector<int> Values;
 	int KeyCooldown = 0;
 	int currentFourier = 0;
 	int TotalFouriersHad = 0;
-
-	Renderer* Rend;
-	std::vector<Fourier> fourier;
-	Settings settings;
-	Blender blender;
-	ToolBox toolBox;
+	int currentState = -1;
 
 	Vector2f SettingsPosition = DefaultSettingsPosition;
 	Vector2i WindowPosition = Vector2i(0, 0);
 
-	bool SettingsOpen = false;
-	bool SomethingHasChanged = true;
+	bool SettingsOpen	= false;
+	bool Change			= true;
 	bool PressingButton = false;
-	bool ShowGrid = true;
+	bool ShowGrid		= true;
 
 	Color ColorWheel(int n);
 
-	void Reset();
 	void AddFourier();
 	void DeleteFourier();
 	void DuplicateFourier();
 
-	void EventCheck(RenderWindow& window);
-	void KeyboardEventCheck();
-
-	Vector2i MouseWindowPosition();
+	Vector2i mousePosition();
 	void WindowMovement(Vector2i NewWindowPosition);
 	void change();
 	bool fouriersOccupied();
-	void SetFourier(int N);
 	void LoadFromFile(std::string filename);
 	void SaveToFile(std::string filename);
 	
+	void purgeStates();
+	void pushState(int Nature);
+	void pushState(int nature, int identifier);
+	void pushState(int nature, int identifier, std::vector<Point> points, Color color, std::vector<int> values, std::string name);
+	void loadPrev();
+	void loadNext();
+
+	void EventCheck(RenderWindow& window);
 	void ButtonsActions(int ButtonPressed);
+
+	void Display(RenderWindow& window);
 
 public:
 	Engine();

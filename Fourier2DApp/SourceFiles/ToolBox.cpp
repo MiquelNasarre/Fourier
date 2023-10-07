@@ -103,10 +103,25 @@ void ToolBox::ExpVertFourier(Fourier& fourier, float k)
 	moveFourier(fourier, center);
 }
 
-bool ToolBox::EventCheck(Vector2i MousePos, Fourier& fourier)
+bool ToolBox::Close()
+{
+	IconButton.setColor(Color(255, 255, 255, 120));
+	if (isOpen)
+		isOpen = false;
+	if (Position.y < DefaultToolBoxPos.y + 110.f) {
+		Position.y += 5;
+		Box.setPosition(AddVectors(Position, Vector2f(50.f, -70.f)));
+		for (int i = 0; i < (int)Tools.size(); i++)
+			Tools[i].IncreasePosition(0.f, 5.f);
+		return true;
+	}
+	return false;
+}
+
+bool ToolBox::EventCheck(Vector2i MousePos, Fourier& fourier, bool& saves, int number)
 {
 	bool change = false;
-
+	IconButton.setColor(Color(255, 255, 255, 255));
 	if (isOpen && Position.y > DefaultToolBoxPos.y) {
 		change = true;
 		Position.y -= 5;
@@ -136,24 +151,32 @@ bool ToolBox::EventCheck(Vector2i MousePos, Fourier& fourier)
 		event = Tools[MoveUp].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			moveFourier(fourier, Vector2f(0.f, MovementSpeed));
 
 		event = Tools[MoveDown].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			moveFourier(fourier, Vector2f(0.f, -MovementSpeed));
 
 		event = Tools[MoveLeft].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			moveFourier(fourier, Vector2f(-MovementSpeed, 0.f));
 
 		event = Tools[MoveRight].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			moveFourier(fourier, Vector2f(MovementSpeed, 0.f));
 
@@ -161,17 +184,23 @@ bool ToolBox::EventCheck(Vector2i MousePos, Fourier& fourier)
 		if (event > 0)
 			change = true;
 		if (event == Button::Pressed)
+			saves = true;
+		if (event == Button::Pressed)
 			moveToCenter(fourier);
 
 		event = Tools[RotateRight].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			RotateFourier(fourier, -RotatingRate);
 
 		event = Tools[RotateLeft].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			RotateFourier(fourier, RotatingRate);
 
@@ -179,52 +208,66 @@ bool ToolBox::EventCheck(Vector2i MousePos, Fourier& fourier)
 		if (event > 0)
 			change = true;
 		if (event == Button::Pressed)
+			saves = true;
+		if (event == Button::Pressed)
 			ExpHortFourier(fourier, -1);
 
 		event = Tools[FlipVertical].EventCheck(MousePos);
 		if (event > 0)
 			change = true;
 		if (event == Button::Pressed)
+			saves = true;
+		if (event == Button::Pressed)
 			ExpVertFourier(fourier, -1);
 
 		event = Tools[Expand].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			ExpandFourier(fourier, ExpansionRate);
 
 		event = Tools[Shrink].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			ExpandFourier(fourier, ShrinkingRate);
 
 		event = Tools[SquishHort].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			ExpHortFourier(fourier, ShrinkingRate);
 
 		event = Tools[SquishVert].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			ExpVertFourier(fourier, ShrinkingRate);
 
 		event = Tools[EnlargeHort].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			ExpHortFourier(fourier, ExpansionRate);
 
 		event = Tools[EnlargeVert].EventCheck(MousePos);
 		if (event > 0 || event == Button::Pressing)
 			change = true;
+		if (event == Button::Pressed)
+			saves = true;
 		if (event == Button::Pressed || event == Button::Pressing)
 			ExpVertFourier(fourier, ExpansionRate);
 	}
-
-
 	return change;
 }
 

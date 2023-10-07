@@ -32,11 +32,11 @@ float Renderer::getScale()
     return Scale;
 }
 
-Vector2f Renderer::R2Pos(Vector2f Pos, Vector2i ScreenPos, float scale)
+Vector2f Renderer::R2Pos(Vector2i Pos, Vector2i ScreenPos, float scale)
 {
     Vector2f Vec;
-    Vec.x = (float)Pos.x - (float)ScreenPos.x - (float)ScreenWidth / 2 + Ex;
-    Vec.y = (float)ScreenHeight / 2 - (float)Pos.y + (float)ScreenPos.y + Ey;
+    Vec.x = -(float)ScreenWidth / 2 + float(Pos.x - ScreenPos.x + Ex);
+    Vec.y = (float)ScreenHeight / 2 + float(ScreenPos.y - Pos.y + Ey);
     Vec.x = Vec.x / scale;
     Vec.y = Vec.y / scale;
     return Vec;
@@ -60,14 +60,6 @@ Vector2f Renderer::ScPos(Vector2f Pos, float Radius, float scale)
     return Vec;
 }
 
-Vector2f Renderer::ScPos(Vector2f Pos, Vector2f Dimensions, float scale)
-{
-    Vector2f Vec;
-    Vec.x = Pos.x * scale - Dimensions.x / 2 + ScreenWidth / 2;
-    Vec.y = -Pos.y * scale - Dimensions.y / 2 + ScreenHeight / 2;
-    return Vec;
-}
-
 void Renderer::RenderMousePosition(Vector2i Pos) const
 {
     RectangleShape Back(Vector2f(157.f, 14.f));
@@ -75,7 +67,7 @@ void Renderer::RenderMousePosition(Vector2i Pos) const
     Back.setFillColor(Color(210, 210, 210, 255));
     m_target.draw(Back);
 
-    Vector2f mpR2 = R2Pos((Vector2f)Mouse::getPosition(), Pos, Scale);
+    Vector2f mpR2 = R2Pos(Mouse::getPosition(), Pos, Scale);
     int Eraserx = 4, Erasery = 4;
     if (mpR2.x < 0)Eraserx++;
     if (mpR2.y < 0)Erasery++;
@@ -196,13 +188,6 @@ void Renderer::RenderCircleDescription(Point P, int n) const
 void Renderer::RenderSprite(Sprite& sprite) const
 {
     m_target.draw(sprite);
-}
-
-void Renderer::RenderTexts(std::vector<Text> Texts)
-{
-    int N = Texts.size();
-    for (int i = 0; i < N; i++)
-        m_target.draw(Texts[i]);
 }
 
 void Renderer::RenderText(Text text)

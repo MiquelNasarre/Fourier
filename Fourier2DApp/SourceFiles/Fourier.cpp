@@ -193,13 +193,15 @@ void Fourier::GraphFunctionS0(int N)
 
 void Fourier::RenderFunction(Renderer& renderer)
 {
-	if (Drawing)
+	if (Drawing || !FunctionVisibility)
 		return;
 	renderer.RenderFunction(F);
 }
 
 void Fourier::RenderPoints(Renderer& renderer)
 {
+	if (!PointsVisibility)
+		return;
 	for (int i = 0; i < (int)Points.size(); i++)
 		renderer.RenderPoint(Points[i], i);
 }
@@ -209,7 +211,7 @@ Vector2f Fourier::getPosition(int P)
 	return Points[P].Position;
 }
 
-void Fourier::EventCheck(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values)
+void Fourier::EventCheck(bool& Change, Vector2f MouseR2, float Scale, std::vector<int> Values, bool& saves)
 {
 	int Object = CheckCollision(MouseR2, Scale);
 	if (Drawing) {
@@ -256,6 +258,7 @@ void Fourier::EventCheck(bool& Change, Vector2f MouseR2, float Scale, std::vecto
 		}
 		else {
 			if (Object >= 0) {
+				saves = true;
 				SetPointPosition(Object, MouseR2);
 				Dragging = Object;
 				Change = true;
@@ -298,4 +301,3 @@ void Fourier::Draw()
 	Points.clear();
 	Dragging = -3;
 }
-
