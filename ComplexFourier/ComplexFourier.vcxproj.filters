@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{c57b9cb3-7386-4abe-85e3-e9eed634ee5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Private">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Sources\Public">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HeaderFiles\Complex.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Header.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\iFourier.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Renderer.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Visual.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Button.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Settings.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\NumberBar.h">
+      <Filter>Sources\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SourceFiles\Complex.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\main.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\iFourier.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Renderer.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Visual.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Functions.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Button.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\Settings.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="SourceFiles\NumberBar.cpp">
+      <Filter>Sources\Private</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ce547bce-87fb-4866-a3b1-ad48accb0ec5}</ProjectGuid>
-    <RootNamespace>Fourier2DApp</RootNamespace>
+    <ProjectGuid>{1f7882b8-d064-40e6-953f-8c21fff87ea0}</ProjectGuid>
+    <RootNamespace>ComplexFourier</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -90,16 +90,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-system-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-window-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,17 +108,16 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-system.lib;sfml-graphics.lib;sfml-audio.lib;sfml-window.lib;sfml-network.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -126,16 +125,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-system-d.lib;sfml-graphics-d.lib;sfml-audio-d.lib;sfml-window-d.lib;sfml-network-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,53 +143,40 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-system.lib;sfml-graphics.lib;sfml-audio.lib;sfml-window.lib;sfml-network.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies/SFML/lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SourceFiles\Blender.cpp" />
-    <ClCompile Include="SourceFiles\Button.cpp" />
-    <ClCompile Include="SourceFiles\Fourier.cpp" />
-    <ClCompile Include="SourceFiles\Engine.cpp" />
-    <ClCompile Include="SourceFiles\main.cpp" />
-    <ClCompile Include="SourceFiles\NumberBar.cpp" />
-    <ClCompile Include="SourceFiles\Objects.cpp" />
-    <ClCompile Include="SourceFiles\Popup.cpp" />
-    <ClCompile Include="SourceFiles\Renderer.cpp" />
-    <ClCompile Include="SourceFiles\Scroller.cpp" />
-    <ClCompile Include="SourceFiles\Selector.cpp" />
-    <ClCompile Include="SourceFiles\Settings.cpp" />
-    <ClCompile Include="SourceFiles\TickBox.cpp" />
-    <ClCompile Include="SourceFiles\TimeFourier.cpp" />
-    <ClCompile Include="SourceFiles\ToolBox.cpp" />
+    <ClInclude Include="HeaderFiles\Button.h" />
+    <ClInclude Include="HeaderFiles\Complex.h" />
+    <ClInclude Include="HeaderFiles\Header.h" />
+    <ClInclude Include="HeaderFiles\iFourier.h" />
+    <ClInclude Include="HeaderFiles\NumberBar.h" />
+    <ClInclude Include="HeaderFiles\Renderer.h" />
+    <ClInclude Include="HeaderFiles\Settings.h" />
+    <ClInclude Include="HeaderFiles\Visual.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeaderFiles\Blender.h" />
-    <ClInclude Include="HeaderFiles\Button.h" />
-    <ClInclude Include="HeaderFiles\Fourier.h" />
-    <ClInclude Include="HeaderFiles\Engine.h" />
-    <ClInclude Include="HeaderFiles\Header.h" />
-    <ClInclude Include="HeaderFiles\NumberBar.h" />
-    <ClInclude Include="HeaderFiles\Objects.h" />
-    <ClInclude Include="HeaderFiles\Popup.h" />
-    <ClInclude Include="HeaderFiles\Renderer.h" />
-    <ClInclude Include="HeaderFiles\Scroller.h" />
-    <ClInclude Include="HeaderFiles\Selector.h" />
-    <ClInclude Include="HeaderFiles\Settings.h" />
-    <ClInclude Include="HeaderFiles\TickBox.h" />
-    <ClInclude Include="HeaderFiles\TimeFourier.h" />
-    <ClInclude Include="HeaderFiles\ToolBox.h" />
+    <ClCompile Include="SourceFiles\Button.cpp" />
+    <ClCompile Include="SourceFiles\Complex.cpp" />
+    <ClCompile Include="SourceFiles\Functions.cpp" />
+    <ClCompile Include="SourceFiles\iFourier.cpp" />
+    <ClCompile Include="SourceFiles\main.cpp" />
+    <ClCompile Include="SourceFiles\NumberBar.cpp" />
+    <ClCompile Include="SourceFiles\Renderer.cpp" />
+    <ClCompile Include="SourceFiles\Settings.cpp" />
+    <ClCompile Include="SourceFiles\Visual.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
