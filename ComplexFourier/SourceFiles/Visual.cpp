@@ -4,17 +4,8 @@ Visual::Visual()
 	:renderer{ Renderer(window) },
 	DataRenderer{ Renderer(dataWindow,350,200) }
 {
-	window.create(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", sf::Style::Titlebar | sf::Style::Close);
-	window.setFramerateLimit(30);
-	window.setPosition(AddVectors(window.getPosition(), Vector2i(0, -25)));
-
-	Image icon;
-	icon.loadFromFile("Resources/Textures/Icon.png");
-	TransparentGreenScreen(&icon);
-	window.setIcon(51, 51, icon.getPixelsPtr());
-
 	std::vector<Complex> points;
-	float n = 400;
+	float n = 200;
 	for (int i = 0; i < n / 4; i++)
 		points.push_back(1 - 4 * i / n + I);
 	for (int i = 0; i < n / 4; i++)
@@ -25,16 +16,16 @@ Visual::Visual()
 		points.push_back(1 + I * (-1 + 4 * i / n));
 
 	fourier.setPoints(points);
+	computeFourier();
 
-	fourier.fullComputation(settings.error);
-	fourier.generatePlot(FunctionSmoothness);
+	window.create(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", sf::Style::Titlebar | sf::Style::Close);
+	window.setFramerateLimit(30);
+	window.setPosition(window.getPosition() + Vector2i(0, -25));
 
-	std::vector<Complex> coef = fourier.getCoef();
-	std::vector<int> ordr = fourier.getOrder();
-
-	for (unsigned int i = 0; i < coef.size(); i++)
-		printf("coef: %i \tis %s\n", ordr[i],coef[i].str().c_str());
-	
+	Image icon;
+	icon.loadFromFile("Resources/Textures/Icon.png");
+	TransparentGreenScreen(&icon);
+	window.setIcon(51, 51, icon.getPixelsPtr());
 	
 }
 
@@ -46,23 +37,158 @@ Vector2i Visual::mousePosition()
 
 void Visual::createDataWindow()
 {
-	dataWindow.create(VideoMode(350, 200), "MiniWindow", Style::Titlebar | Style::Resize);
-	dataWindow.setPosition(Vector2i(window.getPosition().x + 820, window.getPosition().y + 430));
+	dataWindow.create(VideoMode((unsigned int)dataWindowWidth, (unsigned int)dataWindowHeight), "", Style::Resize);
+	dataWindow.setPosition(Vector2i(window.getPosition() + (Vector2i)window.getSize() + Vector2i(-dataWindowWidth - 20, -dataWindowHeight - 20)));
+
+	 view = View(sf::FloatRect(0, 0, dataWindowWidth, dataWindowHeight));
+
+	dataWindow.setView(view);
 }
 
 void Visual::eventsDataWindow()
 {
+	dataWindow.requestFocus();
 	Event event;
-	while (dataWindow.pollEvent(event));
+	while (dataWindow.pollEvent(event)) {
+		if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape)
+			dataWindow.close();
+		if (event.type == sf::Event::Resized) {
+			view.setSize((float)event.size.width, (float)event.size.height);
+			view.setCenter(float(event.size.width / 2), float(event.size.height / 2));
+			dataWindow.setView(view);
+		}
+	}
 
-	//DataRenderer.setWindowDim((Vector2i)dataWindow.getSize());
-	dataWindow.clear(Color::White);
-	DataRenderer.RenderPoint(Complex(0), Color::Black, 10.f);
+	std::vector<Complex> coef = fourier.getCoef();
+	std::vector<int> order = fourier.getOrder();
+
+	float width = (float)dataWindow.getSize().x;
+	float height = (float)dataWindow.getSize().y;
+
+	RectangleShape rect(Vector2f(2*(width - 2 * HorizontalMargin) / coef.size() - 1, 1.f));
+	rect.setFillColor(DataColor);
+
+	Font font;
+	font.loadFromFile(ArialFontFile);
+	Text num;
+	num.setFont(font);
+	num.setFillColor(DataColor);
+	num.setCharacterSize(9);
+
+	float bigger = 0, x;
+	std::vector<float> absCoef;
+	for (unsigned int i = 0; i < coef.size(); i++) {
+		x = coef[i].abs();
+		absCoef.push_back(x);
+		if (x > bigger)
+			bigger = x;
+	}
+
+	int minimum = order[0];
+	for (unsigned int i = 0; i < order.size(); i++) {
+		if (order[i] > 0 && minimum > order[i])
+			minimum = order[i];
+	}
+
+	int modulus = 1;
+	if (order.size() > 40)
+		modulus = 2;
+	if (order.size() > 100)
+		modulus = 5;
+	if (order.size() > 200)
+		modulus = 10;
+	if (order.size() > 500)
+		modulus = 20;
+
+	dataWindow.clear(BackgroundColor);
+
+	for (unsigned int i = 0; i < coef.size(); i++) {
+		rect.setScale(1.f, -absCoef[i] / bigger * (height - 2 * VerticalMargin) / 2 - 1);
+		rect.setPosition(HorizontalMargin + (order[i] * (float)pow(-1, i) - minimum) * (width - 2 * HorizontalMargin) / order.size() * 2, height - VerticalMargin - height * (i % 2) / 2);
+		dataWindow.draw(rect);
+		
+		if (!(order[i] % modulus)) {
+			num.setString(std::to_string(order[i] * (int)pow(-1, i)));
+			num.setPosition(rect.getPosition() + rect.getSize() / 2 - num.getGlobalBounds().getSize() / 2 + Vector2f(0.f, 4.f));
+			dataWindow.draw(num);
+		}
+	}
+
+	Vertex line0[] = { Vertex(Vector2f(HorizontalMargin / 2,height - VerticalMargin / 2),DataColor),Vertex(Vector2f(width - HorizontalMargin / 2,height - VerticalMargin / 2),DataColor) };
+	dataWindow.draw(line0, 2, Lines);
+	Vertex line1[] = { Vertex(Vector2f(HorizontalMargin / 2,height / 2 - VerticalMargin / 2),DataColor),Vertex(Vector2f(width - HorizontalMargin / 2,height / 2 - VerticalMargin / 2),DataColor) };
+	dataWindow.draw(line1, 2, Lines);
+	Vertex line2[] = { Vertex(Vector2f(HorizontalMargin - VerticalMargin / 2,height - VerticalMargin / 2),DataColor),Vertex(Vector2f(HorizontalMargin - VerticalMargin / 2,height / 2),DataColor) };
+	dataWindow.draw(line2, 2, Lines);
+	Vertex line3[] = { Vertex(Vector2f(HorizontalMargin - VerticalMargin / 2,height / 2 - VerticalMargin / 2),DataColor),Vertex(Vector2f(HorizontalMargin - VerticalMargin / 2, 0.f), DataColor) };
+	dataWindow.draw(line3, 2, Lines);
+
+	
+
 	dataWindow.display();
+}
+
+void Visual::drawingEvents()
+{
+	Event event;
+	while (window.pollEvent(event)) {
+		if (event.type == Event::Closed)
+			window.close();
+		if (event.type == Event::MouseWheelMoved)
+			renderer.multiplyScale((float)pow(1.1, event.mouseWheel.delta));
+	}
+
+	Complex MouseComplex = renderer.ComplexPos((Vector2f)mousePosition());
+
+	if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+		drawing = false;
+		if (canva.size() > 1) {
+			std::vector<Complex> plot;
+			for (int i = 0; i < settings.points; i++) {
+				float s = float(i * canva.size()) / settings.points;
+				float ds = s - int(s);
+				plot.push_back(canva[(int)s] * (1 - ds) + canva[int(s + 1) % canva.size()] * ds);
+			}
+			renderer.setCenter(renderer.getCenter() + fourier.setPoints(plot));
+			computeFourier();
+			fourier.setTime(0.f);
+		}
+		canva.clear();
+		return;
+	}
+	if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+		drawing = false;
+		canva.clear();
+		return;
+	}
+	if (Mouse::isButtonPressed(Mouse::Left)) {
+		if (pressing)
+			return;
+		if (!canva.size())
+			return canva.push_back(MouseComplex);
+		if ((canva[canva.size() - 1] - MouseComplex).abs() > 1.f / renderer.getScale())
+			return canva.push_back(MouseComplex);
+	}
+	else
+		pressing = false;
+}
+
+void Visual::computeFourier()
+{
+	fourier.fullComputation(settings.error);
+	fourier.generatePlot(FunctionSmoothness);
+
+	std::vector<Complex> coef = fourier.getCoef();
+	std::vector<int> ordr = fourier.getOrder();
+	printf("\n\n");
+	for (unsigned int i = 0; i < coef.size(); i++)
+		printf("coef: %i \tis %s\n", ordr[i], coef[i].str().c_str());
 }
 
 void Visual::eventCheck()
 {
+	if (drawing)
+		return drawingEvents();
 	Vector2i MousePos = mousePosition();
 
 	Event event;
@@ -72,33 +198,80 @@ void Visual::eventCheck()
 		if (event.type == Event::MouseWheelMoved)
 			renderer.multiplyScale((float)pow(1.1, event.mouseWheel.delta));
 
-		settings.ErrorBar.EventCheck(event, MousePos);
+		if (settings.ErrorBar.EventCheck(event, MousePos)) {
+			settings.error = settings.ErrorBar.getNumber();
+			computeFourier();
+		}
+
+		if (settings.NumberPoints.EventCheck(event, MousePos)) {
+			settings.points = (int)settings.NumberPoints.getNumber();
+			if (settings.points < 2) {
+				settings.points = 2;
+				settings.NumberPoints.setNumber((float)settings.points);
+			}
+			fourier.setPoints(settings.points);
+			computeFourier();
+		}
 	}
 	if (settings.playing)
-		fourier.setTime(fourier.getTime() + 0.001f);
+		fourier.setTime(fourier.getTime() + speed);
 
 	if (pressing && !Mouse::isButtonPressed(Mouse::Left))
 		pressing = false;
 
-	if (settings.DataWindow.EventCheck(MousePos) == Button::Pressed) {
+	if (dataWindow.isOpen())
+		eventsDataWindow();
+
+	if (settings.DataWindow.eventCheck(MousePos) == Button::Pressed) {
 		if (!dataWindow.isOpen())
 			createDataWindow();
 		else
 			dataWindow.close();
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
+		pressing = true;
+		return;
 	}
 
-	if (dataWindow.isOpen())
-		eventsDataWindow();
-
-	else if (settings.playing && !pressing && settings.Pause.EventCheck(MousePos) == Button::Pressed) {
+	else if (settings.playing && !pressing && settings.Pause.eventCheck(MousePos) == Button::Pressed) {
 		settings.playing = false;
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
 		pressing = true;
+		return;
 	}
 		
 
-	else if (!settings.playing && !pressing && settings.Play.EventCheck(MousePos) == Button::Pressed) {
+	else if (!settings.playing && !pressing && settings.Play.eventCheck(MousePos) == Button::Pressed) {
 		settings.playing = true;
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
 		pressing = true;
+		return;
+	}
+
+	else if (!pressing && settings.IncreaseSpeed.eventCheck(MousePos) == Button::Pressed) {
+		speed *= speedMult;
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
+		pressing = true;
+		return;
+	}
+
+	else if (!pressing && settings.DecreaseSpeed.eventCheck(MousePos) == Button::Pressed) {
+		speed /= speedMult;
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
+		pressing = true;
+		return;
+	}
+
+	else if (!pressing && settings.Draw.eventCheck(MousePos) == Button::Pressed) {
+		drawing = true;
+		pressing = true;
+		CircleView = 0;
+		dataWindow.close();
+		return;
 	}
 
 	else if (Mouse::isButtonPressed(Mouse::Left) && !pressing) {
@@ -133,6 +306,13 @@ void Visual::render()
 	if (Plain) {
 		renderer.RenderGrid();
 		renderer.RenderAxis();
+	}
+	if (drawing) {
+		if (!Mouse::isButtonPressed(Mouse::Left) && canva.size())
+			renderer.RenderPoint(canva[canva.size() - 1], Color(50, 50, 50, 255), 2.f);
+		renderer.RenderPlot(canva,PointsColor);
+		window.display();
+		return;
 	}
 	fourier.renderPoints(renderer);
 	fourier.renderPartialPlot(renderer);

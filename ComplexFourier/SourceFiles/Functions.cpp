@@ -36,22 +36,26 @@ bool InsideCircle(Vector2i MousePos, Vector2f Position, int radius)
 	return false;
 }
 
-Vector2f IncreaseVector(Vector2f vector, float dx, float dy)
-{
-	return Vector2f(vector.x + dx, vector.y + dy);
-}
-
-Vector2f AddVectors(Vector2f v0, Vector2f v1)
+Vector2f operator+(const Vector2f& v0, const Vector2f& v1)
 {
 	return Vector2f(v0.x + v1.x, v0.y + v1.y);
 }
 
-Vector2i AddVectors(Vector2i v0, Vector2i v1)
+Vector2i operator+(const Vector2i& v0, const Vector2i& v1)
 {
 	return Vector2i(v0.x + v1.x, v0.y + v1.y);
 }
 
-Vector2i AddVectors(Vector2i v0, Vector2i v1, Vector2i v2)
+Vector2f operator*(const Vector2f& v0, const Vector2f& v1) {
+	return Vector2f(v0.x * v1.x, v0.y * v1.y);
+}
+
+Vector2f operator*(const Vector2f& v0, const float& x)
 {
-	return Vector2i(v0.x + v1.x + v2.x, v0.y + v1.y + v2.y);
+	return Vector2f(v0.x * x, v0.y * x);
+}
+
+Vector2f operator/(const Vector2f& v0, const float& x)
+{
+	return Vector2f(v0.x / x, v0.y / x);
 }

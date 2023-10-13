@@ -54,6 +54,11 @@ Complex Complex::operator*(const float& other)
 	return Complex(other * a, other * b);
 }
 
+Complex Complex::operator*(const double& other)
+{
+	return Complex(float(other) * a, float(other) * b);
+}
+
 Complex Complex::operator+(const int& other)
 {
 	return Complex((float)other + a, b);
@@ -62,6 +67,11 @@ Complex Complex::operator+(const int& other)
 Complex Complex::operator+(const float& other)
 {
 	return Complex(other + a, b);
+}
+
+Complex Complex::operator+(const double& other)
+{
+	return Complex(float(other) + a, b);
 }
 
 Complex& Complex::operator+=(const Complex& other)
@@ -103,6 +113,11 @@ Complex operator*(const float& lhs, const Complex& rhs)
 	return Complex(lhs * rhs.a, lhs * rhs.b);
 }
 
+Complex operator*(const double& lhs, const Complex& rhs)
+{
+	return float(lhs) * rhs;
+}
+
 Complex operator+(const int& lhs, const Complex& rhs)
 {
 	return Complex(float(lhs) + rhs.a, rhs.b);
@@ -111,6 +126,11 @@ Complex operator+(const int& lhs, const Complex& rhs)
 Complex operator+(const float& lhs, const Complex& rhs)
 {
 	return Complex(lhs + rhs.a, rhs.b);
+}
+
+Complex operator+(const double& lhs, const Complex& rhs)
+{
+	return Complex(float(lhs) + rhs.a, rhs.b);
 }
 
 Complex operator/(const int& lhs, const Complex& rhs)
@@ -123,6 +143,11 @@ Complex operator/(const float& lhs, const Complex& rhs)
 	return Complex(lhs) / rhs;
 }
 
+Complex operator/(const double& lhs, const Complex& rhs)
+{
+	return Complex(float(lhs)) / rhs;
+}
+
 Complex operator-(const int& lhs, const Complex& rhs)
 {
 	return Complex(float(lhs) - rhs.a, - rhs.b);
@@ -131,4 +156,9 @@ Complex operator-(const int& lhs, const Complex& rhs)
 Complex operator-(const float& lhs, const Complex& rhs)
 {
 	return Complex(lhs - rhs.a, -rhs.b);
+}
+
+Complex operator-(const double& lhs, const Complex& rhs)
+{
+	return float(lhs) - rhs;
 }

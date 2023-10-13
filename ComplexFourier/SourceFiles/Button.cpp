@@ -137,7 +137,7 @@ void Button::setString(std::string String)
 	text.setString(String);
 }
 
-int Button::EventCheck(Vector2i MouseScPos)
+int Button::eventCheck(Vector2i MouseScPos)
 {
 	if (InsideRectangle(MouseScPos,Position,(Vector2i)Dimensions)) {
 		if (Mouse::isButtonPressed(Mouse::Left)) {

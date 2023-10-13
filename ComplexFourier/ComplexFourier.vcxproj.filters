@@ -39,7 +39,7 @@
     <ClInclude Include="HeaderFiles\Settings.h">
       <Filter>Sources\Public</Filter>
     </ClInclude>
-    <ClInclude Include="HeaderFiles\NumberBar.h">
+    <ClInclude Include="HeaderFiles\DecimalBar.h">
       <Filter>Sources\Public</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,7 +68,7 @@
     <ClCompile Include="SourceFiles\Settings.cpp">
       <Filter>Sources\Private</Filter>
     </ClCompile>
-    <ClCompile Include="SourceFiles\NumberBar.cpp">
+    <ClCompile Include="SourceFiles\DecimalBar.cpp">
       <Filter>Sources\Private</Filter>
     </ClCompile>
   </ItemGroup>

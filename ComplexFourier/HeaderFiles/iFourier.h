@@ -36,7 +36,8 @@ public:
 	iFourier() {}
 	iFourier(std::vector<Complex>& points);
 
-	void setPoints(std::vector<Complex>& points);
+	Complex setPoints(std::vector<Complex>& points);
+	void setPoints(int number);
 	void setOrder(std::vector<int> order);
 	void setTime(float t);
 	

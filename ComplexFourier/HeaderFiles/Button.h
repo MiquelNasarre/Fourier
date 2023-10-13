@@ -78,6 +78,6 @@ public:
 	void setFont(Font font);
 	void setString(std::string String);
 
-	int EventCheck(Vector2i MouseScPos);
+	int eventCheck(Vector2i MouseScPos);
 	void Render(RenderWindow& window);
 };

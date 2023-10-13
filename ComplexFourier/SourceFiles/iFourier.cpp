@@ -5,9 +5,25 @@ iFourier::iFourier(std::vector<Complex>& points)
 {
 }
 
-void iFourier::setPoints(std::vector<Complex>& points)
+Complex iFourier::setPoints(std::vector<Complex>& points)
 {
+	Complex average = 0;
+	for (unsigned int i = 0; i < points.size(); i++)
+		average += points[i];
+	average = average / (int)points.size();
+	for (unsigned int i = 0; i < points.size(); i++)
+		points[i] += -average;
 	Points = points;
+	return -average;
+}
+
+void iFourier::setPoints(int number)
+{
+	Points.clear();
+	for (int i = 0; i < number; i++) {
+		Points.push_back(eval(i * 2 * Pi / number));
+	}
+	Points.push_back(Points[0]);
 }
 
 void iFourier::setOrder(std::vector<int> order)
@@ -158,6 +174,7 @@ void iFourier::fullComputation(float error)
 
 void iFourier::generateCoef()
 {
+	Coef.clear();
 	for (unsigned int i = 0; i < Order.size(); i++) {
 		Coef.push_back(Complex(0));
 		for (unsigned int j = 0; j < Points.size(); j++)
@@ -192,13 +209,15 @@ void iFourier::renderPlot(Renderer& renderer)
 
 void iFourier::renderPartialPlot(Renderer& renderer)
 {
-	int i = int(Plot.size() * time) + 1;
+	int i = int(Plot.size() * time);
 	std::vector<Complex> plot(Plot.begin(), Plot.begin() + i);
+	plot.push_back(eval(time * 2 * Pi));
 	renderer.RenderPlot(plot);
 }
 
 void iFourier::renderCircles(Renderer& renderer, float scale)
 {
+	renderer.RenderPoint(0);
 	std::vector<Complex> Circle;
 	Complex center, nextcenter(0);
 	for (unsigned int i = 0; i < Order.size(); i++) {
@@ -223,5 +242,3 @@ void iFourier::renderPoints(Renderer& renderer)
 {
 	renderer.RenderPoints(Points);
 }
-
-

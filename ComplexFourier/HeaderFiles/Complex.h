@@ -22,8 +22,10 @@ struct Complex {
 	Complex operator-();
 	Complex operator*(const int& other);
 	Complex operator*(const float& other);
+	Complex operator*(const double& other);
 	Complex operator+(const int& other);
 	Complex operator+(const float& other);
+	Complex operator+(const double& other);
 	Complex& operator+=(const Complex& other);
 
 	static Complex exp(const Complex& exponent);
@@ -36,9 +38,13 @@ struct Complex {
 
 Complex operator*(const int& lhs, const Complex& rhs);
 Complex operator*(const float& lhs, const Complex& rhs);
+Complex operator*(const double& lhs, const Complex& rhs);
 Complex operator+(const int& lhs, const Complex& rhs);
 Complex operator+(const float& lhs, const Complex& rhs);
+Complex operator+(const double& lhs, const Complex& rhs);
 Complex operator/(const int& lhs, const Complex& rhs);
 Complex operator/(const float& lhs, const Complex& rhs);
+Complex operator/(const double& lhs, const Complex& rhs);
 Complex operator-(const int& lhs, const Complex& rhs);
 Complex operator-(const float& lhs, const Complex& rhs);
+Complex operator-(const double& lhs, const Complex& rhs);

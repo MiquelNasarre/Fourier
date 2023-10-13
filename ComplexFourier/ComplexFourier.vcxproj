@@ -94,6 +94,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,7 +163,7 @@
     <ClInclude Include="HeaderFiles\Complex.h" />
     <ClInclude Include="HeaderFiles\Header.h" />
     <ClInclude Include="HeaderFiles\iFourier.h" />
-    <ClInclude Include="HeaderFiles\NumberBar.h" />
+    <ClInclude Include="HeaderFiles\DecimalBar.h" />
     <ClInclude Include="HeaderFiles\Renderer.h" />
     <ClInclude Include="HeaderFiles\Settings.h" />
     <ClInclude Include="HeaderFiles\Visual.h" />
@@ -173,7 +174,7 @@
     <ClCompile Include="SourceFiles\Functions.cpp" />
     <ClCompile Include="SourceFiles\iFourier.cpp" />
     <ClCompile Include="SourceFiles\main.cpp" />
-    <ClCompile Include="SourceFiles\NumberBar.cpp" />
+    <ClCompile Include="SourceFiles\DecimalBar.cpp" />
     <ClCompile Include="SourceFiles\Renderer.cpp" />
     <ClCompile Include="SourceFiles\Settings.cpp" />
     <ClCompile Include="SourceFiles\Visual.cpp" />
