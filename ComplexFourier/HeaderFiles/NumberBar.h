@@ -3,7 +3,7 @@
 #include "Header.h"
 #include "Renderer.h"
 
-#define DefaultNumberBarInitializer "Resources/Textures/CustomButtons.png",std::vector({Vector2i(293,458),Vector2i(293,483),Vector2i(293,508)}),Vector2i(36,21)
+#define DefaultNumberBarInitializer "Resources/Textures/CustomButtons.png",std::vector<Vector2i>({Vector2i(293,458),Vector2i(293,483),Vector2i(293,508)}),Vector2i(36,21)
 
 class NumberBar {
 private:

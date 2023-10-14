@@ -404,7 +404,7 @@ void Visual::render()
 	if (settings.pointsVisible)
 		fourier.renderPoints(renderer);
 	fourier.renderPartialPlot(renderer);
-	fourier.renderCircles(renderer, renderer.getScale() / 200);
+	fourier.renderCircles(renderer, settings.playing);
 	settings.render(window);
 	window.display();
 }

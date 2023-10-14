@@ -224,13 +224,13 @@ void iFourier::renderPartialPlot(Renderer& renderer)
 	renderer.RenderPlot(plot);
 }
 
-void iFourier::renderCircles(Renderer& renderer, float scale)
+void iFourier::renderCircles(Renderer& renderer, bool opaque)
 {
 	renderer.RenderPoint(0);
 	std::vector<Complex> Circle;
 	Complex center, nextcenter(0);
 	for (unsigned int i = 0; i < Order.size(); i++) {
-		int points = int(CircleSmoothness * Coef[i].abs() * scale);
+		int points = int(Coef[i].abs() * renderer.getScale() * 2 * Pi);
 		if (!points)
 			continue;
 		if (points > CircleSmoothness)
@@ -241,9 +241,17 @@ void iFourier::renderCircles(Renderer& renderer, float scale)
 		
 		for (int j = 0; j <= points; j++)
 			Circle.push_back(Coef[i] * Complex::exp(I * 2 * Pi * j / points) + center);
-		renderer.RenderPlot(Circle, CircleColor);
-		renderer.RenderLine(center, nextcenter, LineColor);
-		renderer.RenderPoint(nextcenter);
+		if (!opaque){
+			renderer.RenderPlot(Circle, CircleColor * Color(255,255,255,100));
+			renderer.RenderLine(center, nextcenter, LineColor * Color(255, 255, 255, 100));
+			renderer.RenderPoint(nextcenter, Color(100,100,100,100));
+		}
+		else {
+			renderer.RenderPlot(Circle, CircleColor);
+			renderer.RenderLine(center, nextcenter, LineColor);
+			renderer.RenderPoint(nextcenter);
+		}
+		
 	}
 }
 

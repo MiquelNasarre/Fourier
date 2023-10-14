@@ -71,7 +71,7 @@ public:
 
 	void renderPlot(Renderer& renderer);
 	void renderPartialPlot(Renderer& renderer);
-	void renderCircles(Renderer& renderer, float scale = 1.f);
+	void renderCircles(Renderer& renderer, bool opaque = true);
 	void renderPoints(Renderer& renderer);
 
 };

@@ -171,8 +171,8 @@ std::string Popup::InputString(std::string WindowName, int MaxSize) {
     text.setFont(font);
     text.setFillColor(Color::Black);
     text.setCharacterSize(15);
-    Button Cancel("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(8.f, 50.f), true,"Cancel",Vector2f(40.f,6.f),font,16);
-    Button Enter("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(160.f, 50.f), true, "Enter", Vector2f(47.f, 6.f), font, 16);
+    Button Cancel("Resources/Textures/CustomButtons.png", std::vector<Vector2i>({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(8.f, 50.f), true,"Cancel",Vector2f(40.f,6.f),font,16);
+    Button Enter("Resources/Textures/CustomButtons.png", std::vector<Vector2i>({ Vector2i(0, 3),Vector2i(0,36),Vector2i(0,69) }), Vector2i(89, 32), Vector2f(1.5f, 1.f), Vector2f(160.f, 50.f), true, "Enter", Vector2f(47.f, 6.f), font, 16);
     Texture TexBack;
     TexBack.loadFromFile("Resources/Textures/CustomButtons.png", IntRect(0, 36, 89, 32));
     Sprite BackText(TexBack);
@@ -263,7 +263,7 @@ Color Popup::ColorSelection(Color Current)
     BrightnessSlider.setPosition(22.f, 300.f);
 
     
-    Button EnterButton("Resources/Textures/CustomButtons.png", std::vector({ Vector2i(363,460),Vector2i(413,460),Vector2i(463,460) }), Vector2i(48, 53), Vector2f(1.3f, 1.f), Vector2f(293.f, 283.f),true, "Select",Vector2f(8.f,16.f),font,16);
+    Button EnterButton("Resources/Textures/CustomButtons.png", std::vector<Vector2i>({ Vector2i(363,460),Vector2i(413,460),Vector2i(463,460) }), Vector2i(48, 53), Vector2f(1.3f, 1.f), Vector2f(293.f, 283.f),true, "Select",Vector2f(8.f,16.f),font,16);
 
     std::vector<RectangleShape> Background;
     Background.push_back(RectangleShape(Vector2f(260.f, 260.f)));
