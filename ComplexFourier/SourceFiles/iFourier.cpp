@@ -88,7 +88,7 @@ float iFourier::getCircleRadius(int i)
 	return Coef[i].abs();
 }
 
-float iFourier::norm2(std::vector<Complex> points)
+float iFourier::norm2(std::vector<Complex>& points)
 {
 	float x = 0;
 	int m = points.size();
@@ -135,6 +135,15 @@ float iFourier::margin()
 {
 	Margin = std::abs(ddNorm2 * Norm2 - dNorm2 * dNorm2);
 	return Margin;
+}
+
+float iFourier::discreteError()
+{
+	int size = Points.size();
+	std::vector<Complex> error;
+	for (int i = 0; i < size; i++)
+		error.push_back(Points[i] - eval(2 * i * Pi / size));
+	return sqrt(norm2(error) / Norm2);
 }
 
 void iFourier::computeLf(float error)

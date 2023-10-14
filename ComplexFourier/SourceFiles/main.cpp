@@ -2,6 +2,6 @@
 
 int main()
 {
-	Visual visual;
+	Visual visual("HelloWorld");
 	visual.mainLoop();
 }

@@ -25,7 +25,7 @@ class Renderer
 {
 private:
     RenderTarget& m_target;
-    float Scale = 200;
+    float Scale = 100;
     Complex Center = 0;
     Font font;
 

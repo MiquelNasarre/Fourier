@@ -5,6 +5,7 @@
 #include "iFourier.h"
 #include "Button.h"
 #include "Settings.h"
+#include "Popup.h"
 
 #ifdef DarkTheme
 	#define BackgroundColor Color::Black
@@ -40,13 +41,15 @@ private:
 	bool pressing = false;
 	Vector2i MouseTracker;
 	Complex PrevCenter;
-	float speed = 0.001f;
+	float speed = 0.0015f;
 
+	bool demo = true;
 	bool drawing = false;
+	bool circleVisibility = true;
 	std::vector<Complex> canva;
 
 public:
-	Visual();
+	Visual(std::string filename = "");
 
 	Vector2i mousePosition();
 
@@ -55,6 +58,8 @@ public:
 	void drawingEvents();
 
 	void computeFourier();
+	void saveFile(std::string filename = "");
+	void loadFile(std::string filename = "");
 
 	void eventCheck();
 	void render();

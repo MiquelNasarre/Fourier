@@ -90,7 +90,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
@@ -109,7 +109,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/SFML/include;$(ProjectDir)/HeaderFiles;$(SolutionDir)Dependencies</AdditionalIncludeDirectories>
     </ClCompile>
@@ -164,6 +164,8 @@
     <ClInclude Include="HeaderFiles\Header.h" />
     <ClInclude Include="HeaderFiles\iFourier.h" />
     <ClInclude Include="HeaderFiles\DecimalBar.h" />
+    <ClInclude Include="HeaderFiles\NumberBar.h" />
+    <ClInclude Include="HeaderFiles\Popup.h" />
     <ClInclude Include="HeaderFiles\Renderer.h" />
     <ClInclude Include="HeaderFiles\Settings.h" />
     <ClInclude Include="HeaderFiles\Visual.h" />
@@ -175,6 +177,8 @@
     <ClCompile Include="SourceFiles\iFourier.cpp" />
     <ClCompile Include="SourceFiles\main.cpp" />
     <ClCompile Include="SourceFiles\DecimalBar.cpp" />
+    <ClCompile Include="SourceFiles\NumberBar.cpp" />
+    <ClCompile Include="SourceFiles\Popup.cpp" />
     <ClCompile Include="SourceFiles\Renderer.cpp" />
     <ClCompile Include="SourceFiles\Settings.cpp" />
     <ClCompile Include="SourceFiles\Visual.cpp" />

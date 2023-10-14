@@ -1,22 +1,27 @@
 #include "Visual.h"
 
-Visual::Visual()
+Visual::Visual(std::string filename)
 	:renderer{ Renderer(window) },
 	DataRenderer{ Renderer(dataWindow,350,200) }
 {
-	std::vector<Complex> points;
-	float n = 200;
-	for (int i = 0; i < n / 4; i++)
-		points.push_back(1 - 4 * i / n + I);
-	for (int i = 0; i < n / 4; i++)
-		points.push_back(-1 + I * (1 - 4 * i / n));
-	for (int i = 0; i < n / 4; i++)
-		points.push_back(-1 + 4 * i / n - I);
-	for (int i = 0; i < n / 4; i++)
-		points.push_back(1 + I * (-1 + 4 * i / n));
+	if (filename.size())
+		loadFile(filename);
 
-	fourier.setPoints(points);
-	computeFourier();
+	else {
+		std::vector<Complex> points;
+		float n = 200;
+		for (int i = 0; i < n / 4; i++)
+			points.push_back(1 - 4 * i / n + I);
+		for (int i = 0; i < n / 4; i++)
+			points.push_back(-1 + I * (1 - 4 * i / n));
+		for (int i = 0; i < n / 4; i++)
+			points.push_back(-1 + 4 * i / n - I);
+		for (int i = 0; i < n / 4; i++)
+			points.push_back(1 + I * (-1 + 4 * i / n));
+
+		fourier.setPoints(points);
+		computeFourier();
+	}
 
 	window.create(VideoMode(ScreenWidth, ScreenHeight), "Fourier Plotter", sf::Style::Titlebar | sf::Style::Close);
 	window.setFramerateLimit(30);
@@ -40,9 +45,10 @@ void Visual::createDataWindow()
 	dataWindow.create(VideoMode((unsigned int)dataWindowWidth, (unsigned int)dataWindowHeight), "", Style::Resize);
 	dataWindow.setPosition(Vector2i(window.getPosition() + (Vector2i)window.getSize() + Vector2i(-dataWindowWidth - 20, -dataWindowHeight - 20)));
 
-	 view = View(sf::FloatRect(0, 0, dataWindowWidth, dataWindowHeight));
+	view = View(sf::FloatRect(0, 0, dataWindowWidth, dataWindowHeight));
 
 	dataWindow.setView(view);
+	
 }
 
 void Visual::eventsDataWindow()
@@ -123,7 +129,13 @@ void Visual::eventsDataWindow()
 	Vertex line3[] = { Vertex(Vector2f(HorizontalMargin - VerticalMargin / 2,height / 2 - VerticalMargin / 2),DataColor),Vertex(Vector2f(HorizontalMargin - VerticalMargin / 2, 0.f), DataColor) };
 	dataWindow.draw(line3, 2, Lines);
 
-	
+	num.setString("NEGATIVE");
+	num.setPosition(int(width - num.getGlobalBounds().width - HorizontalMargin), 20);
+	dataWindow.draw(num);
+
+	num.setString("POSITIVE");
+	num.setPosition(int(width - num.getGlobalBounds().width - HorizontalMargin), int(height / 2 + 20.f));
+	dataWindow.draw(num);
 
 	dataWindow.display();
 }
@@ -152,6 +164,8 @@ void Visual::drawingEvents()
 			renderer.setCenter(renderer.getCenter() + fourier.setPoints(plot));
 			computeFourier();
 			fourier.setTime(0.f);
+			demo = true;
+			settings.playing = true;
 		}
 		canva.clear();
 		return;
@@ -183,6 +197,50 @@ void Visual::computeFourier()
 	printf("\n\n");
 	for (unsigned int i = 0; i < coef.size(); i++)
 		printf("coef: %i \tis %s\n", ordr[i], coef[i].str().c_str());
+
+	std::string ComputedError = std::to_string(fourier.discreteError());
+	ComputedError.pop_back();
+	ComputedError.pop_back();
+	settings.texts[Settings::DiscreteErrorText].setString(ComputedError);
+	settings.texts[Settings::DiscreteErrorText].setPosition(Vector2f(142.f - settings.texts[Settings::DiscreteErrorText].getLocalBounds().width, 115.f));
+	settings.texts[Settings::CoefficientsText].setString(std::to_string(coef.size()));
+	settings.texts[Settings::CoefficientsText].setPosition(Vector2f(142.f - settings.texts[Settings::CoefficientsText].getLocalBounds().width, 140.f));
+}
+
+void Visual::saveFile(std::string filename)
+{
+	if (!filename.size())
+		filename = Popup::InputString();
+	if (!filename.size())
+		return;
+	std::string location = "SaveFiles/" + filename + ".dat";
+	FILE* file = fopen(location.c_str(), "w");
+	std::vector<Complex> points = fourier.getPoints();
+	for (unsigned int i = 0; i < points.size(); i++)
+		fprintf(file, "%f %f\n", points[i].a, points[i].b);
+	fclose(file);
+}
+
+void Visual::loadFile(std::string filename)
+{
+	if (!filename.size())
+		filename = Popup::InputString("Name of the file");
+	if (!filename.size())
+		return;
+	std::string location = "SaveFiles/" + filename + ".dat";
+	FILE* file = fopen(location.c_str(), "r");
+	std::vector<Complex> points;
+	float a, b;
+	while (fscanf(file, "%f %f\n", &a, &b) != EOF)
+		points.push_back(a + b * I);
+	fclose(file);
+	fourier.setPoints(points);
+	computeFourier();
+	demo = true;
+	fourier.setTime(0);
+	settings.points = points.size();
+	settings.NumberPoints.setNumber(settings.points);
+	settings.playing = true;
 }
 
 void Visual::eventCheck()
@@ -213,8 +271,16 @@ void Visual::eventCheck()
 			computeFourier();
 		}
 	}
-	if (settings.playing)
-		fourier.setTime(fourier.getTime() + speed);
+	if (settings.playing) {
+		if (demo && fourier.getTime() + speed > 1) {
+			fourier.setTime(1.f);
+			settings.playing = false;
+			demo = false;
+		}
+		else
+			fourier.setTime(fourier.getTime() + speed);
+	}
+		
 
 	if (pressing && !Mouse::isButtonPressed(Mouse::Left))
 		pressing = false;
@@ -240,10 +306,25 @@ void Visual::eventCheck()
 		pressing = true;
 		return;
 	}
-		
-
+	
 	else if (!settings.playing && !pressing && settings.Play.eventCheck(MousePos) == Button::Pressed) {
 		settings.playing = true;
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
+		pressing = true;
+		return;
+	}
+
+	else if (settings.pointsVisible && !pressing && settings.Hide.eventCheck(MousePos) == Button::Pressed) {
+		settings.pointsVisible = false;
+		MouseTracker = MousePos;
+		PrevCenter = renderer.getCenter();
+		pressing = true;
+		return;
+	}
+
+	else if (!settings.pointsVisible && !pressing && settings.Show.eventCheck(MousePos) == Button::Pressed) {
+		settings.pointsVisible = true;
 		MouseTracker = MousePos;
 		PrevCenter = renderer.getCenter();
 		pressing = true;
@@ -274,7 +355,13 @@ void Visual::eventCheck()
 		return;
 	}
 
-	else if (Mouse::isButtonPressed(Mouse::Left) && !pressing) {
+	else if (!pressing && settings.Save.eventCheck(MousePos) == Button::Pressed)
+		return saveFile();
+
+	else if (!pressing && settings.Load.eventCheck(MousePos) == Button::Pressed)
+		return loadFile();
+
+	else if (Mouse::isButtonPressed(Mouse::Left) && !pressing && window.hasFocus()) {
 		for (int i = (int)fourier.getCoef().size() - 1; i > 0; i--) {
 			if (InsideCircle(MousePos, renderer.ScPos(fourier.getCircleCenter(i)), int(fourier.getCircleRadius(i) * renderer.getScale()))) {
 				CircleView = i;
@@ -314,7 +401,8 @@ void Visual::render()
 		window.display();
 		return;
 	}
-	fourier.renderPoints(renderer);
+	if (settings.pointsVisible)
+		fourier.renderPoints(renderer);
 	fourier.renderPartialPlot(renderer);
 	fourier.renderCircles(renderer, renderer.getScale() / 200);
 	settings.render(window);

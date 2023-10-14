@@ -52,12 +52,13 @@ public:
 	Complex					getCircleCenter(int i);
 	float					getCircleRadius(int i);
 
-	static float norm2(std::vector<Complex> points);
+	static float norm2(std::vector<Complex>& points);
 
 	float norm2();
 	float dnorm2();
 	float ddnorm2();
 	float margin();
+	float discreteError();
 
 	void computeLf(float error = 0.f);
 	void OrderLf();
