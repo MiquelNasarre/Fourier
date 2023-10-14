@@ -130,11 +130,11 @@ void Visual::eventsDataWindow()
 	dataWindow.draw(line3, 2, Lines);
 
 	num.setString("NEGATIVE");
-	num.setPosition(int(width - num.getGlobalBounds().width - HorizontalMargin), 20);
+	num.setPosition(width - num.getGlobalBounds().width - HorizontalMargin, 20.f);
 	dataWindow.draw(num);
 
 	num.setString("POSITIVE");
-	num.setPosition(int(width - num.getGlobalBounds().width - HorizontalMargin), int(height / 2 + 20.f));
+	num.setPosition(width - num.getGlobalBounds().width - HorizontalMargin, height / 2 + 20.f);
 	dataWindow.draw(num);
 
 	dataWindow.display();
@@ -239,7 +239,7 @@ void Visual::loadFile(std::string filename)
 	demo = true;
 	fourier.setTime(0);
 	settings.points = points.size();
-	settings.NumberPoints.setNumber(settings.points);
+	settings.NumberPoints.setNumber((float)settings.points);
 	settings.playing = true;
 }
 
